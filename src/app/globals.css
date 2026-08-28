@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/* -------------------------------------------------------------------------
+ * Old Brush · Design tokens
+ * Palette, typography, radii, easings, spacing.
+ * Single source of truth for the entire visual system.
+ * ------------------------------------------------------------------------- */
+@theme {
+  /* Colour · Old Brush palette (Brand Guidelines) */
+  --color-ob-sand: #a19079;
+  --color-ob-gold: #9b762b;
+  --color-ob-lightgreen: #7b9685;
+  --color-ob-green: #242f17;
+
+  /* Derived neutrals */
+  --color-ob-paper: #f5f1ea;         /* warm off-white surface */
+  --color-ob-paper-soft: #ebe4d7;    /* subtle divider on paper */
+  --color-ob-ink: #1a1f11;           /* text on paper */
+  --color-ob-ink-soft: #47513a;      /* secondary text on paper */
+  --color-ob-line: #d9ceba;          /* hairline on paper */
+  --color-ob-gold-soft: #c69a4c;     /* hover fill on gold */
+
+  /* Typography */
+  --font-serif: var(--font-lora), Georgia, "Times New Roman", serif;
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+
+  /* Type scale (fluid) */
+  --text-eyebrow: 0.75rem;
+  --text-base: 1rem;
+  --text-lead: 1.125rem;
+  --text-h3: clamp(1.35rem, 1.05rem + 1.2vw, 1.75rem);
+  --text-h2: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
+  --text-h1: clamp(2.25rem, 1.5rem + 3.4vw, 3.75rem);
+
+  /* Radii — deliberately restrained */
+  --radius-none: 0;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease-brush: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-plaster: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 520ms;
+
+  /* Layout */
+  --container-narrow: 68rem;
+  --container-base: 75rem;
+  --container-wide: 82.5rem;
+}
+
+/* -------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-ob-paper);
+  color: var(--color-ob-ink);
+  font-family: var(--font-serif);
+  font-size: var(--text-base);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Consistent heading rhythm */
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  line-height: 1.15;
+  letter-spacing: -0.005em;
+  color: var(--color-ob-green);
+}
+
+h1 {
+  font-size: var(--text-h1);
+  font-weight: 500;
+}
+
+h2 {
+  font-size: var(--text-h2);
+  font-weight: 500;
+}
+
+h3 {
+  font-size: var(--text-h3);
+  font-weight: 500;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* Focus states — gold ring, always visible */
+:focus-visible {
+  outline: 2px solid var(--color-ob-gold);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--color-ob-gold);
+  color: var(--color-ob-paper);
+}
+
+/* -------------------------------------------------------------------------
+ * Utilities · Old Brush surfaces
+ * These map the palette to reusable surface classes so components stay lean.
+ * ------------------------------------------------------------------------- */
+.surface-paper {
+  background-color: var(--color-ob-paper);
+  color: var(--color-ob-ink);
+}
+.surface-sand {
+  background-color: var(--color-ob-sand);
+  color: var(--color-ob-paper);
+}
+.surface-lightgreen {
+  background-color: var(--color-ob-lightgreen);
+  color: var(--color-ob-paper);
+}
+.surface-green {
+  background-color: var(--color-ob-green);
+  color: var(--color-ob-paper);
+}
+.surface-gold {
+  background-color: var(--color-ob-gold);
+  color: var(--color-ob-paper);
+}
+
+/* Editorial eyebrow label (used by SectionHeading) */
+.ob-eyebrow {
+  font-family: var(--font-display);
+  font-size: var(--text-eyebrow);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--color-ob-gold);
+}
+
+/* Hairline divider */
+.ob-hairline {
+  height: 1px;
+  background-color: var(--color-ob-line);
+  border: 0;
+}
+
+/* -------------------------------------------------------------------------
+ * Reduced motion
+ * Any component reading prefers-reduced-motion also honours it in JS;
+ * this global rule is the CSS-only fallback.
+ * ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

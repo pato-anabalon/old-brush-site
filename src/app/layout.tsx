@@ -1,0 +1,45 @@
+import type { Metadata, Viewport } from 'next'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Footer } from '@/components/organisms/Footer'
+import { Header } from '@/components/organisms/Header'
+import { Preloader } from '@/components/molecules/Preloader'
+import { cormorant, lora } from '@/lib/fonts'
+import { baseMetadata, localBusinessJsonLd } from '@/lib/seo'
+import './globals.css'
+
+export const metadata: Metadata = baseMetadata
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#242F17',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en-NZ" className={`${lora.variable} ${cormorant.variable}`}>
+      <body>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1000] focus:rounded-[var(--radius-sm)] focus:bg-[var(--color-ob-green)] focus:px-4 focus:py-2 focus:text-[var(--color-ob-paper)]"
+        >
+          Skip to content
+        </a>
+        <Preloader />
+        <Header />
+        <main id="main">{children}</main>
+        <Footer />
+
+        {/* JSON-LD · LocalBusiness */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessJsonLd()) }}
+        />
+
+        <Analytics />
+        <SpeedInsights />
+      </body>
+    </html>
+  )
+}
