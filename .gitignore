@@ -1,0 +1,50 @@
+# macOS
+.DS_Store
+
+# Dependencies
+/node_modules
+
+# Next.js
+/.next
+/out
+next-env.d.ts
+
+# Build outputs
+/build
+/dist
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store
+
+# Env files (never commit)
+.env
+.env.local
+.env.*.local
+
+# Vercel
+.vercel
+
+# TypeScript incremental builds
+*.tsbuildinfo
+
+# IDE / editors
+.idea
+.vscode/*
+!.vscode/settings.example.json
+.cursor
+.aider*
+
+# Test / coverage
+/coverage
+/.nyc_output
+
+# OS temp
+Thumbs.db
+
+# Local scratch
+/.scratch
