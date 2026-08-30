@@ -215,11 +215,27 @@ export const nav = {
 /**
  * Hero copy is separated so the brand voice lives in one place
  * and the organism stays layout-focused.
+ *
+ * `headline` is a segmented array so the Hero can render editorial italics
+ * on emphasised words without hardcoding the copy inside the component.
+ * `headlinePlain` mirrors the same text as a single string, used anywhere
+ * a flat title is needed (aria labels, structured data, tests).
  */
+export type HeadlineSegment = { text: string; em?: boolean }
+
 export const hero = {
   eyebrow: 'Traditional Finishes · Auckland',
-  headline: 'Refined interior plastering and painting, carried out with care.',
+  headline: [
+    { text: 'Refined interior ' },
+    { text: 'plastering', em: true },
+    { text: ' and ' },
+    { text: 'painting', em: true },
+    { text: ', carried out with care.' },
+  ] satisfies readonly HeadlineSegment[],
+  headlinePlain:
+    'Refined interior plastering and painting, carried out with care.',
   lead: 'Old Brush delivers Level 4 and Level 5 plaster finishes and premium interior painting across Auckland — for renovations, new builds and residential homes that deserve a finish designed to last.',
+  strip: ['Level 4 & 5 plaster', 'Interior painting', 'Auckland only'],
   primaryCta: { label: 'Request a quote', href: '/contact' },
   secondaryCta: { label: 'See our services', href: '/#services' },
 } as const

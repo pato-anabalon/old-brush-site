@@ -106,6 +106,9 @@ Names describe function + context, not visual detail.
 | `site-header-drawer` | Header mobile drawer | Full-screen nav |
 | `site-footer` | `Footer` organism | Footer container |
 | `home-hero-section` | `HeroBrush` organism | Hero section |
+| `home-hero-media` | Hero mobile image frame | Rounded ShapeFrame on <lg |
+| `home-hero-media-desktop` | Hero desktop image frame | Arch-top-right ShapeFrame on ≥lg |
+| `home-hero-inset` | Hero polaroid inset | Overlapping brand-authentic craftsman shot |
 | `home-hero-primary-cta` | Hero primary button | "Request a quote" |
 | `home-hero-secondary-cta` | Hero secondary button | "See our services" |
 | `home-<id>-placeholder` | Home placeholder | Fase 1 anchor stubs (`services`, `process`, `gallery`, `about`, `contact`) |
@@ -131,3 +134,4 @@ Additions to this map require an entry here in the same PR.
 - **2026-08-28 · Preloader = 1100 ms one-time-per-session animation.** SVG logo construction, curtain reveal.
 - **2026-08-28 · Services grid = 5 cards** (Renovations & New Builds as a single card).
 - **2026-08-28 · No credentials provisioned yet.** All integrations degrade visibly; provisioning is a follow-up task after design ships.
+- **2026-08-30 · Hero redesigned to editorial layered composition.** Two-column split with `ShapeFrame` (arch-top-right main image + overlapping polaroid inset), curved `WaveDivider` between all home sections, alternating `paper` / `paper-soft` / `green` surfaces. New atoms: `ShapeFrame`, `WaveDivider`. Hero headline is now a segmented array (`{ text, em? }[]`) with Cormorant Garamond italic emphasis on "plastering" and "painting".

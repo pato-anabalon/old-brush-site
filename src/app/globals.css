@@ -32,11 +32,20 @@
   --text-h2: clamp(1.75rem, 1.25rem + 2vw, 2.5rem);
   --text-h1: clamp(2.25rem, 1.5rem + 3.4vw, 3.75rem);
 
-  /* Radii — deliberately restrained */
+  /* Radii — mixed scale: crisp for CTAs, editorial for imagery */
   --radius-none: 0;
   --radius-sm: 2px;
   --radius-md: 4px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-frame: 28px;      /* image frames */
+  --radius-arch: 45% 45% 24px 24px / 32% 32% 24px 24px;  /* arch-top mask */
   --radius-pill: 999px;
+
+  /* Shadows — soft, warm, editorial */
+  --shadow-soft: 0 20px 40px -20px color-mix(in oklab, var(--color-ob-green) 40%, transparent);
+  --shadow-frame: 0 40px 80px -40px color-mix(in oklab, var(--color-ob-green) 55%, transparent);
+  --shadow-float: 0 24px 48px -18px color-mix(in oklab, var(--color-ob-green) 45%, transparent), 0 4px 12px -4px color-mix(in oklab, var(--color-ob-green) 30%, transparent);
 
   /* Motion */
   --ease-brush: cubic-bezier(0.65, 0, 0.35, 1);
