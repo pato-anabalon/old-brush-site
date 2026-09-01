@@ -83,27 +83,35 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Consistent heading rhythm */
-h1, h2, h3, h4 {
-  font-family: var(--font-serif);
-  line-height: 1.15;
-  letter-spacing: -0.005em;
-  color: var(--color-ob-green);
-}
+/* Consistent heading rhythm.
+ * Wrapped in @layer base so Tailwind utility classes (which live in the
+ * `utilities` layer, later in cascade order) can still override things
+ * like text-[var(--color-ob-paper)] on dark section surfaces. Without
+ * the layer wrap, unlayered rules would beat layered utilities of the
+ * same specificity — headings would stay green even when a component
+ * asks for paper. */
+@layer base {
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+    line-height: 1.15;
+    letter-spacing: -0.005em;
+    color: var(--color-ob-green);
+  }
 
-h1 {
-  font-size: var(--text-h1);
-  font-weight: 500;
-}
+  h1 {
+    font-size: var(--text-h1);
+    font-weight: 500;
+  }
 
-h2 {
-  font-size: var(--text-h2);
-  font-weight: 500;
-}
+  h2 {
+    font-size: var(--text-h2);
+    font-weight: 500;
+  }
 
-h3 {
-  font-size: var(--text-h3);
-  font-weight: 500;
+  h3 {
+    font-size: var(--text-h3);
+    font-weight: 500;
+  }
 }
 
 p {

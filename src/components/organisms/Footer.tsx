@@ -1,21 +1,27 @@
 import { Mail, MapPin, Phone } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { Container } from '@/components/atoms/Container'
 import { Divider } from '@/components/atoms/Divider'
-import { Logo } from '@/components/atoms/Logo'
-import { brand, nav } from '@/lib/content'
+import { brand, credit, nav } from '@/lib/content'
 
 export function Footer() {
   return (
     <footer
       data-testid="site-footer"
-      className="surface-green pt-20 pb-10 mt-24"
+      className="surface-green pt-20 pb-10"
     >
       <Container width="wide">
         <div className="grid gap-12 md:grid-cols-[1.2fr_1fr_1fr]">
           {/* Brand block */}
           <div className="flex flex-col gap-5">
-            <Logo variant="stacked" tone="paper" />
+            <Image
+              src="/brand/logo-white-transparent.png"
+              alt={`${brand.name} · ${brand.tagline}`}
+              width={140}
+              height={140}
+              className="h-24 w-24 sm:h-28 sm:w-28"
+            />
             <Divider tone="sand" />
             <p className="text-[var(--color-ob-paper)]/80 text-[0.95rem] max-w-sm">
               Refined interior plastering and painting across Auckland — carried out with care, for finishes designed to last.
@@ -73,6 +79,19 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {brand.legalName}. All rights reserved.
           </p>
+          <a
+            href={credit.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={credit.ariaLabel}
+            className="transition-colors hover:text-[var(--color-ob-gold)]"
+            data-testid="site-footer-credit"
+          >
+            {credit.prefix}{' '}
+            <span aria-hidden="true">{credit.heart}</span>{' '}
+            {credit.by}{' '}
+            <span className="font-medium">{credit.label}</span>
+          </a>
           <p className="ob-eyebrow" style={{ color: 'var(--color-ob-sand)' }}>
             {brand.tagline} · {brand.location.short}
           </p>

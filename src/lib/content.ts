@@ -162,6 +162,7 @@ export const processSteps: readonly ProcessStep[] = [
 ] as const
 
 export type CoreValue = {
+  slug: string
   name: string
   body: string
 }
@@ -173,18 +174,22 @@ export type CoreValue = {
  */
 export const coreValues: readonly CoreValue[] = [
   {
+    slug: 'craftsmanship',
     name: 'Craftsmanship',
     body: 'Every finish reflects the skill, care and pride behind our work.',
   },
   {
+    slug: 'integrity',
     name: 'Integrity',
     body: 'Honouring traditional techniques through precision, patience and attention to every detail.',
   },
   {
+    slug: 'trust',
     name: 'Trust',
     body: 'Built through honest communication, reliable service and consistent results.',
   },
   {
+    slug: 'timeless-quality',
     name: 'Timeless Quality',
     body: 'Finishes designed to endure — results homeowners can rely on for years to come.',
   },
@@ -224,20 +229,49 @@ export const nav = {
 export type HeadlineSegment = { text: string; em?: boolean }
 
 export const hero = {
-  eyebrow: 'Traditional Finishes · Auckland',
+  eyebrow: 'Traditional Finishes',
   headline: [
     { text: 'Refined interior ' },
     { text: 'plastering', em: true },
-    { text: ' and ' },
+    { text: ' & ' },
     { text: 'painting', em: true },
-    { text: ', carried out with care.' },
+    { text: '.' },
   ] satisfies readonly HeadlineSegment[],
-  headlinePlain:
-    'Refined interior plastering and painting, carried out with care.',
-  lead: 'Old Brush delivers Level 4 and Level 5 plaster finishes and premium interior painting across Auckland — for renovations, new builds and residential homes that deserve a finish designed to last.',
+  headlinePlain: 'Refined interior plastering & painting.',
+  lead: 'Level 4 & 5 finishes across Auckland — carried out with care.',
   strip: ['Level 4 & 5 plaster', 'Interior painting', 'Auckland only'],
   primaryCta: { label: 'Request a quote', href: '/contact' },
   secondaryCta: { label: 'See our services', href: '/#services' },
+  bottomLabel: 'Auckland · New Zealand',
+} as const
+
+/**
+ * Process section header copy.
+ */
+export const processSection = {
+  eyebrow: 'Our approach',
+  headline: 'Five steps, no surprises.',
+  lead: 'The same disciplined arc on every project — so you always know what happens next.',
+} as const
+
+/**
+ * Services section header copy.
+ */
+export const servicesSection = {
+  eyebrow: 'What we do',
+  headline: 'Preparation, plaster and paint — carried out with care.',
+  lead: 'Five services covering the full arc of refined interior work in Auckland — from meticulous preparation through to the last coat.',
+  cardCta: 'Discuss this service',
+} as const
+
+/**
+ * Gallery section header copy.
+ */
+export const gallerySection = {
+  eyebrow: 'The look',
+  headline: "Interiors, at Old Brush's standard.",
+  lead: 'Reference imagery for the atmosphere and craft we chase across Auckland — real project photography lands here as consent and material are confirmed.',
+  valuesEyebrow: 'Core values',
 } as const
 
 /**
@@ -253,10 +287,26 @@ export const about = {
 } as const
 
 /**
+ * Builder credit — rendered in the Footer and at the bottom of the
+ * mobile navigation drawer. Third-party (Nodo, not Old Brush) so the
+ * emoji is intentional; if the "no emojis in UI" rule needs to hold
+ * strictly, swap the 💜 for a Lucide `Heart` icon here.
+ */
+export const credit = {
+  prefix: 'Built with',
+  heart: '💜',
+  by: 'by',
+  label: 'Nodo.co.nz',
+  href: 'https://www.nodo.co.nz',
+  ariaLabel: 'Built by Nodo — visit nodo.co.nz (opens in a new tab)',
+} as const
+
+/**
  * Contact block copy — used by both the home banner and the /contact page.
  */
 export const contact = {
   eyebrow: 'Start your project',
   headline: 'Tell us about your space.',
   lead: 'Share the details and we will come back within one working day.',
+  cta: { label: 'Request a quote', href: '/contact' },
 } as const

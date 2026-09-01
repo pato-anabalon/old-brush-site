@@ -18,8 +18,19 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-NZ" className={`${lora.variable} ${cormorant.variable}`}>
-      <body>
+    <html
+      lang="en-NZ"
+      translate="no"
+      className={`${lora.variable} ${cormorant.variable}`}
+    >
+      {/* suppressHydrationWarning at <body>: some browser extensions
+          (e.g. ColorZilla injecting `cz-shortcut-listen="true"`) mutate
+          <body> before React hydrates.
+          `translate="no"` on <html> + the `google: notranslate` meta in
+          `seo.ts` prevent Chrome mobile's auto-translate widget from
+          mutating the tree deeper (a common source of hydration errors
+          on mobile only). Users can still translate manually. */}
+      <body suppressHydrationWarning>
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[1000] focus:rounded-[var(--radius-sm)] focus:bg-[var(--color-ob-green)] focus:px-4 focus:py-2 focus:text-[var(--color-ob-paper)]"

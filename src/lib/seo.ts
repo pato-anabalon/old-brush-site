@@ -45,7 +45,16 @@ export const baseMetadata: Metadata = {
     googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
   },
   icons: {
-    icon: '/favicon.ico',
+    icon: '/brand/favicon.png',
+    apple: '/brand/favicon.png',
+    shortcut: '/brand/favicon.png',
+  },
+  other: {
+    // Belt-and-suspenders with `translate="no"` on <html>: tells Chrome
+    // mobile to skip its auto-translate suggestion widget, which would
+    // otherwise mutate the DOM after SSR and trigger a hydration error
+    // for non-English users.
+    google: 'notranslate',
   },
 }
 

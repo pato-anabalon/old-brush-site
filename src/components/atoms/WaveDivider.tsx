@@ -26,8 +26,17 @@ type Props = {
   to: Tone
   variant?: Variant
   flip?: boolean
+  /**
+   * When true, the div's own background is skipped. The parent provides
+   * the "from" colour, and only the `to`-filled shape is drawn. Useful
+   * when the divider sits as an overlay inside a section (e.g. absolutely
+   * pinned to the bottom of the Hero) so that a full-section BrushTracing
+   * behind it stays visible above the curve.
+   */
+  transparentFrom?: boolean
   className?: string
   height?: number
+  'data-testid'?: string
 }
 
 /**
@@ -45,14 +54,20 @@ export function WaveDivider({
   to,
   variant = 'wave',
   flip = false,
+  transparentFrom = false,
   className,
   height = 96,
+  ...rest
 }: Props) {
   return (
     <div
       aria-hidden="true"
-      className={cn('relative w-full overflow-hidden leading-[0]', className)}
-      style={{ backgroundColor: toneVar[from], height }}
+      data-testid={rest['data-testid']}
+      className={cn('w-full overflow-hidden leading-[0]', className)}
+      style={{
+        backgroundColor: transparentFrom ? undefined : toneVar[from],
+        height,
+      }}
     >
       <svg
         viewBox="0 0 1440 120"

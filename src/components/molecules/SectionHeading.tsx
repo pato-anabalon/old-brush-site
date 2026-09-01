@@ -9,6 +9,11 @@ type Props = {
   align?: 'left' | 'center'
   tone?: 'ink' | 'paper'
   as?: 'h1' | 'h2' | 'h3'
+  /**
+   * DOM id applied to the rendered heading — used by parents that need
+   * a stable target for `aria-labelledby`.
+   */
+  headingId?: string
   className?: string
   children?: ReactNode
 }
@@ -25,6 +30,7 @@ export function SectionHeading({
   align = 'left',
   tone = 'ink',
   as: Heading = 'h2',
+  headingId,
   className,
   children,
 }: Props) {
@@ -39,7 +45,9 @@ export function SectionHeading({
     >
       {eyebrow ? <span className="ob-eyebrow">{eyebrow}</span> : null}
       <Divider tone={tone === 'paper' ? 'sand' : 'gold'} className={align === 'center' ? 'mx-auto' : ''} />
-      <Heading className={cn('max-w-[42rem]', t.headline)}>{headline}</Heading>
+      <Heading id={headingId} className={cn('max-w-[42rem]', t.headline)}>
+        {headline}
+      </Heading>
       {lead ? <p className={cn('max-w-[38rem] text-[var(--text-lead)]', t.lead)}>{lead}</p> : null}
       {children}
     </div>

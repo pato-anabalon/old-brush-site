@@ -8,21 +8,48 @@ import { brand } from '@/lib/content'
 const SESSION_KEY = 'ob_seen'
 
 /**
- * Preloader · Old Brush · one-shot logo-construction animation.
+ * Signal the Hero (or any other reveal-coordinated component) that
+ * the preloader is done covering the viewport. Uses a CustomEvent on
+ * window plus a global flag so late-mounting listeners still see the
+ * "already revealed" state and don't hang waiting on an event that
+ * has already fired.
+ */
+const REVEAL_EVENT = 'ob:hero-reveal'
+const markRevealed = () => {
+  ;(window as unknown as { __obHeroRevealed?: boolean }).__obHeroRevealed = true
+  window.dispatchEvent(new CustomEvent(REVEAL_EVENT))
+}
+
+/**
+ * Assets that must be in the browser cache before we reveal the site.
+ * All of these are used above the fold (hero backdrop + cycled house
+ * imagery) so a flash of missing content after the reveal would look
+ * broken. Add extras conservatively — every entry extends the minimum
+ * time the preloader is on screen for users on slow connections.
+ */
+const CRITICAL_ASSETS = [
+  '/brand/logo-transparent.png',
+  '/images/house-1.jpg',
+  '/images/house-2.jpg',
+  '/images/house-3.jpg',
+  '/images/house-4.jpg',
+  '/images/house-5.jpg',
+]
+const MIN_DURATION_MS = 1100 // guarantees the reveal never feels rushed
+const MAX_DURATION_MS = 5000 // fail-safe when an asset stalls
+
+/**
+ * Preloader · Old Brush.
  *
- * Storyboard (approved 2026-08-28, ~1100 ms):
- * 1. Gold circle traces clockwise.
- * 2. AKL slides in from the left, NZ from the right.
- * 3. "TRADITIONAL FINISHES" arch reveals letter by letter.
- * 4. The green flourish divider draws out from the centre.
- * 5. "OLD BRUSH" wordmark fades and lifts into place.
- * 6. Brush and spatula icons draw simultaneously and cross.
- * 7. Rope knots on both sides fade in.
- * 8. Green curtain opens vertically, revealing the site.
+ * Full-screen green curtain with the real transparent logo centred and
+ * a slim gold progress bar tracking the actual load state of the
+ * assets above the fold. Curtain lifts once every critical asset has
+ * settled AND the minimum display time has elapsed; a fail-safe timeout
+ * closes it if the network hangs.
  *
  * Guards:
- *  - sessionStorage.ob_seen → skip animation, hide instantly on mount.
- *  - prefers-reduced-motion → skip animation entirely.
+ *  - sessionStorage.ob_seen  → skip curtain, hide instantly on mount.
+ *  - prefers-reduced-motion → same skip (respect the user's preference).
  */
 export function Preloader() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -49,7 +76,6 @@ export function Preloader() {
         root.style.pointerEvents = 'none'
       }
 
-      // Lock scroll while the preloader is visible.
       document.documentElement.style.overflow = 'hidden'
       document.body.style.overflow = 'hidden'
 
@@ -57,95 +83,103 @@ export function Preloader() {
         gsap.set(root, { autoAlpha: 0 })
         releaseScroll()
         setSeen()
+        // Defer so any coordinated listener (e.g. Hero) has a chance to
+        // register before we dispatch. The global flag also covers the
+        // opposite race — a listener that mounts after this fires.
+        window.setTimeout(markRevealed, 0)
         return () => {
           releaseScroll()
         }
       }
 
-      const circle = root.querySelector<SVGGeometryElement>('.ob-pl-circle')
-      const flourish = root.querySelector<SVGGeometryElement>('.ob-pl-flourish')
-      const brush = root.querySelector<SVGGeometryElement>('.ob-pl-brush')
-      const spatula = root.querySelector<SVGGeometryElement>('.ob-pl-spatula')
+      const logo = root.querySelector<HTMLImageElement>('.ob-pl-logo')
+      const bar = root.querySelector<HTMLDivElement>('.ob-pl-bar')
+      const fill = root.querySelector<HTMLDivElement>('.ob-pl-fill')
+      if (!logo || !bar || !fill) return
 
-      for (const p of [circle, flourish, brush, spatula]) {
-        if (!p) continue
-        const len = p.getTotalLength()
-        p.style.strokeDasharray = `${len}`
-        p.style.strokeDashoffset = `${len}`
-      }
+      // Prime initial hidden state.
+      gsap.set(logo, { opacity: 0, scale: 0.94, transformOrigin: '50% 50%' })
+      gsap.set(bar, { opacity: 0 })
+      gsap.set(fill, { scaleX: 0, transformOrigin: 'left center' })
 
-      const tl = gsap.timeline({
-        defaults: { ease: 'power3.out' },
-        onComplete: () => {
-          releaseScroll()
-          setSeen()
-        },
+      // Entry: logo settles first, bar fades in slightly after.
+      gsap.to(logo, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.75,
+        ease: 'power3.out',
+        delay: 0.05,
+      })
+      gsap.to(bar, {
+        opacity: 1,
+        duration: 0.4,
+        ease: 'power2.out',
+        delay: 0.35,
       })
 
-      // 1 · Gold circle traces
-      if (circle) {
-        tl.to(circle, { strokeDashoffset: 0, duration: 0.55, ease: 'power2.inOut' }, 0.05)
-      }
+      // Real preload tracking. Progress reflects how many assets have
+      // resolved (either loaded or errored — a failed asset should not
+      // block the curtain).
+      const startTime = performance.now()
+      let loadedCount = 0
+      let finished = false
 
-      // 2 · AKL / NZ slide in
-      tl.fromTo(
-        '.ob-pl-akl',
-        { opacity: 0, x: -8 },
-        { opacity: 1, x: 0, duration: 0.35 },
-        0.32,
-      ).fromTo(
-        '.ob-pl-nz',
-        { opacity: 0, x: 8 },
-        { opacity: 1, x: 0, duration: 0.35 },
-        0.32,
-      )
+      const finish = () => {
+        if (finished) return
+        finished = true
 
-      // 3 · Arch letters staggered
-      tl.fromTo(
-        '.ob-pl-arch tspan',
-        { opacity: 0, y: -4 },
-        { opacity: 1, y: 0, duration: 0.4, stagger: 0.022 },
-        0.42,
-      )
-
-      // 4 · Flourish draws from centre
-      if (flourish) {
-        tl.to(flourish, { strokeDashoffset: 0, duration: 0.35, ease: 'power2.out' }, 0.6)
-      }
-
-      // 5 · OLD BRUSH wordmark
-      tl.fromTo(
-        '.ob-pl-wordmark',
-        { opacity: 0, y: 12, scale: 0.98, transformOrigin: '50% 50%' },
-        { opacity: 1, y: 0, scale: 1, duration: 0.5 },
-        0.68,
-      )
-
-      // 6 · Brush + spatula draw simultaneously
-      if (brush) tl.to(brush, { strokeDashoffset: 0, duration: 0.42 }, 0.78)
-      if (spatula) tl.to(spatula, { strokeDashoffset: 0, duration: 0.42 }, 0.78)
-
-      // 7 · Rope knots
-      tl.fromTo(
-        '.ob-pl-knot',
-        { opacity: 0, scale: 0.85, transformOrigin: '50% 50%' },
-        { opacity: 1, scale: 1, duration: 0.35, stagger: 0.06 },
-        0.95,
-      )
-
-      // 8 · Curtain reveal — collapse the box upward
-      tl.to(
-        root,
-        {
+        const tl = gsap.timeline({
+          onComplete: () => {
+            releaseScroll()
+            setSeen()
+          },
+        })
+        // Snap the bar to full so users see completion before the reveal.
+        tl.to(fill, { scaleX: 1, duration: 0.28, ease: 'power2.out' })
+        // Signal the Hero to start its entry timeline at the exact
+        // moment the curtain begins lifting — so the first hero pieces
+        // sweep in behind the curtain and the big reveals (main diamond
+        // dropping, smalls settling) play out on the uncovered paper.
+        tl.call(markRevealed, undefined, '+=0.12')
+        // Curtain reveal — collapse the box upward.
+        tl.to(root, {
           clipPath: 'polygon(0 0, 100% 0, 100% 0, 0 0)',
           duration: 0.6,
           ease: 'power4.inOut',
-        },
-        1.15,
-      ).set(root, { autoAlpha: 0 })
+        })
+        tl.set(root, { autoAlpha: 0 })
+      }
+
+      const paintProgress = () => {
+        const target = loadedCount / CRITICAL_ASSETS.length
+        gsap.to(fill, { scaleX: target, duration: 0.35, ease: 'power2.out' })
+      }
+
+      const checkComplete = () => {
+        const allLoaded = loadedCount >= CRITICAL_ASSETS.length
+        const minElapsed = performance.now() - startTime >= MIN_DURATION_MS
+        if (allLoaded && minElapsed) finish()
+      }
+
+      const onSettle = () => {
+        loadedCount += 1
+        paintProgress()
+        checkComplete()
+      }
+
+      for (const src of CRITICAL_ASSETS) {
+        const img = new window.Image()
+        img.onload = onSettle
+        img.onerror = onSettle
+        img.src = src
+      }
+
+      const minTimer = window.setTimeout(checkComplete, MIN_DURATION_MS)
+      const maxTimer = window.setTimeout(finish, MAX_DURATION_MS)
 
       return () => {
-        tl.kill()
+        window.clearTimeout(minTimer)
+        window.clearTimeout(maxTimer)
         releaseScroll()
       }
     },
@@ -159,131 +193,36 @@ export function Preloader() {
       data-testid="preloader"
       className="fixed inset-0 z-[999] flex items-center justify-center"
       style={{
-        backgroundColor: 'var(--color-ob-green)',
+        backgroundColor: 'var(--color-ob-paper)',
         clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)',
       }}
     >
-      <svg
-        viewBox="0 0 400 400"
-        width="min(72vw, 380px)"
-        height="min(72vw, 380px)"
-        fill="none"
-        role="img"
-        aria-label={`${brand.name} · ${brand.tagline}`}
-      >
-        <defs>
-          <path id="ob-pl-arch-path" d="M 70 195 A 130 130 0 0 1 330 195" />
-        </defs>
-
-        <circle
-          className="ob-pl-circle"
-          cx="200"
-          cy="200"
-          r="170"
-          stroke="var(--color-ob-gold)"
-          strokeWidth="1.5"
+      <div className="flex flex-col items-center gap-10">
+        {/* Real transparent brand logo — sits on the green curtain. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/brand/logo-transparent.png"
+          alt={`${brand.name} · ${brand.tagline}`}
+          className="ob-pl-logo h-48 w-48 sm:h-56 sm:w-56 lg:h-64 lg:w-64"
         />
 
-        <text
-          className="ob-pl-akl"
-          x="52"
-          y="205"
-          textAnchor="middle"
-          fontSize="12"
-          letterSpacing="3"
-          fill="var(--color-ob-gold)"
-          style={{ fontFamily: 'var(--font-serif)' }}
+        {/* Progress bar — thin gold rail that fills as the critical
+            assets load. */}
+        <div
+          className="ob-pl-bar relative h-[2px] w-48 overflow-hidden sm:w-56"
+          style={{
+            backgroundColor:
+              'color-mix(in oklab, var(--color-ob-gold) 22%, transparent)',
+          }}
+          role="progressbar"
+          aria-hidden="true"
         >
-          AKL
-        </text>
-        <text
-          className="ob-pl-nz"
-          x="348"
-          y="205"
-          textAnchor="middle"
-          fontSize="12"
-          letterSpacing="3"
-          fill="var(--color-ob-gold)"
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          NZ
-        </text>
-
-        <text
-          className="ob-pl-arch"
-          fontSize="12"
-          letterSpacing="4"
-          fill="var(--color-ob-paper)"
-          style={{ fontFamily: 'var(--font-serif)' }}
-        >
-          <textPath href="#ob-pl-arch-path" startOffset="50%" textAnchor="middle">
-            {'TRADITIONAL FINISHES'.split('').map((ch, i) => (
-              <tspan key={i}>{ch === ' ' ? ' ' : ch}</tspan>
-            ))}
-          </textPath>
-        </text>
-
-        <g stroke="var(--color-ob-lightgreen)" strokeWidth="1" fill="none">
-          <path
-            className="ob-pl-flourish"
-            d="M 155 145 L 190 145 M 210 145 L 245 145 M 195 140 L 200 145 L 195 150 L 200 145 L 205 140 L 200 145 L 205 150"
+          <div
+            className="ob-pl-fill absolute inset-y-0 left-0 h-full w-full"
+            style={{ backgroundColor: 'var(--color-ob-gold)' }}
           />
-        </g>
-
-        <g className="ob-pl-wordmark" fill="var(--color-ob-paper)">
-          <text
-            x="200"
-            y="205"
-            textAnchor="middle"
-            fontSize="42"
-            fontWeight="500"
-            letterSpacing="2"
-            style={{ fontFamily: 'var(--font-serif)' }}
-          >
-            OLD
-          </text>
-          <text
-            x="200"
-            y="252"
-            textAnchor="middle"
-            fontSize="42"
-            fontWeight="500"
-            letterSpacing="2"
-            style={{ fontFamily: 'var(--font-serif)' }}
-          >
-            BRUSH
-          </text>
-        </g>
-
-        <g
-          stroke="var(--color-ob-paper)"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path
-            className="ob-pl-brush"
-            d="M 172 315 L 205 282 L 218 295 L 228 305 L 218 315 L 205 305 L 195 315 L 185 305 L 195 295 Z M 172 315 L 155 332"
-          />
-          <path
-            className="ob-pl-spatula"
-            d="M 228 315 L 195 282 L 182 295 L 172 305 L 182 315 L 195 305 L 205 315 L 215 305 L 205 295 Z M 228 315 L 245 332"
-            opacity="0.85"
-          />
-        </g>
-
-        <g stroke="var(--color-ob-gold)" strokeWidth="1" fill="none">
-          <g className="ob-pl-knot" transform="translate(78 300)">
-            <circle r="6" />
-            <path d="M -8 8 Q -2 4 6 8" />
-          </g>
-          <g className="ob-pl-knot" transform="translate(322 300)">
-            <circle r="6" />
-            <path d="M -6 8 Q 2 4 8 8" />
-          </g>
-        </g>
-      </svg>
+        </div>
+      </div>
     </div>
   )
 }
