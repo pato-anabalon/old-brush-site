@@ -63,12 +63,13 @@ Breaking any of the following requires user approval — never silently deviate.
 
 ## 6 · Animation categories
 
-Four categories, **kept separate**:
+Five categories, **kept separate**:
 
 1. **`brushRevealOnce`** — one-shot entry, `ScrollTrigger.once: true`. Currently in `ScrollReveal` molecule.
 2. **`plasterScrub`** — scrub-linked to scroll. Reserved for ornaments (Fase 2).
 3. **`hoverBrushGlow`** — micro-interactions. Reserved (Fase 2).
 4. **`preloaderTimeline`** — one shot on first visit per session. Owned by `Preloader` molecule.
+5. **`quoteStepSwap`** — one shot per step change inside the quote modal, driven by the step index (never scroll-linked). Owned by `QuoteFlow` organism. Outgoing/incoming direction follows the travel direction: forward slides up from `y: +32`, back slides down from `y: -32`, `0.42 s`, `power3.out`. Tweens **`opacity`, never `autoAlpha`** — `autoAlpha` sets `visibility: hidden` on the from-state, and `useGSAP` is a layout effect, so the step's autofocus effect would fire against an unfocusable subtree and leave the caret on `<body>` (Enter then does nothing).
 
 Never mix categories in a single helper. All animations respect `prefers-reduced-motion`.
 
@@ -98,7 +99,7 @@ Names describe function + context, not visual detail.
 | Selector | Location | Purpose |
 |---|---|---|
 | `preloader` | `Preloader` molecule | Detect preloader visibility |
-| `site-header` | `Header` organism | Header container (`data-solid` mirrors state) |
+| `site-header` | `Header` organism | Header container (`data-visible` mirrors hidden/shown state — hidden while the hero is in view) |
 | `site-header-logo` | Header logo link | Home link |
 | `site-header-nav` | Header desktop nav | Primary nav container |
 | `site-header-cta` | Header desktop CTA | "Request a quote" |
@@ -106,13 +107,48 @@ Names describe function + context, not visual detail.
 | `site-header-drawer` | Header mobile drawer | Full-screen nav |
 | `site-footer` | `Footer` organism | Footer container |
 | `home-hero-section` | `HeroBrush` organism | Hero section |
-| `home-hero-media` | Hero mobile image frame | Rounded ShapeFrame on <lg |
-| `home-hero-media-desktop` | Hero desktop image frame | Arch-top-right ShapeFrame on ≥lg |
-| `home-hero-inset` | Hero polaroid inset | Overlapping brand-authentic craftsman shot |
+| `home-hero-backdrop` | `BrushTracing` molecule inside Hero | Continuous line-tracing SVG backdrop (delayed fade-in) |
+| `home-hero-diamonds` | Hero right-column SVG | House image revealed through 3 diamond clip windows |
+| `home-hero-wave` | `WaveDivider` inside Hero | Bottom wave overlay (`transparentFrom`) that clips the backdrop along the curve |
 | `home-hero-primary-cta` | Hero primary button | "Request a quote" |
-| `home-hero-secondary-cta` | Hero secondary button | "See our services" |
-| `home-<id>-placeholder` | Home placeholder | Fase 1 anchor stubs (`services`, `process`, `gallery`, `about`, `contact`) |
+| `home-services-section` | `ServicesGrid` organism | Services section root |
+| `home-services-card-grid` | Services grid wrapper | 5-card responsive grid |
+| `home-services-card-<slug>` | `ServiceCard` article | One card per service slug (`surface-preparation`, `plaster-level-4`, `plaster-level-5`, `interior-painting`, `renovations-new-builds`) |
+| `home-services-card-<slug>-cta` | Service card link | "Discuss this service" → `/contact?service={slug}` |
+| `home-process-section` | `ProcessTimeline` organism | Process section root |
+| `home-process-timeline` | Timeline `<ol>` | Ordered list wrapping the 5 steps |
+| `home-process-step-<n>` | Timeline `<li>` | One list item per step number (1–5) |
+| `home-gallery-section` | `GalleryBento` organism | Gallery section root (green surface) |
+| `home-gallery-grid` | Bento grid wrapper | Asymmetric 4-image composition |
+| `home-gallery-item-<slug>` | Individual gallery tile | `craftsman` (feature) · `approach` · `detail` · `facade` |
+| `home-about-section` | `AboutSection` organism | About section root |
+| `home-about-image` | About right-column image | Brand-authentic brushes shot |
+| `home-about-values` | Values bar wrapper | Horizontal strip below the split |
+| `home-about-value-<slug>` | Individual value cell | `craftsmanship` · `integrity` · `trust` · `timeless-quality` |
+| `home-contact-section` | `ContactBanner` organism | Final CTA banner (green surface) |
+| `home-contact-cta` | Primary "Request a quote" button | Same href as the Hero CTA |
+| `home-contact-email` | mailto link | `brand.contact.email` |
+| `home-contact-phone` | tel link | `brand.contact.phone` |
 | `contact-page` | `/contact` | Contact route root |
+| `contact-page-cta` | `/contact` | "Request a quote" — opens the quote modal |
+| `contact-page-email` / `contact-page-phone` | `/contact` | Direct contact links (no-JS fallback) |
+| `site-header-drawer-cta` | Header mobile drawer | "Request a quote" inside the drawer |
+| `quote-modal` | `QuoteModal` organism | Dialog panel (portalled to `<body>`, mounted only while open) |
+| `quote-modal-close` | `QuoteModal` header | Close button |
+| `quote-progress` | `QuoteModal` header | Thin gold progress rail |
+| `quote-flow` | `QuoteFlow` organism | Step machine wrapper (owns the keyboard model) |
+| `quote-step-<id>` | `QuoteStep` molecule | One per step id (`projectType`, `services`, `suburb`, `timeframe`, `message`, `attachments`, `contactDetails`) |
+| `quote-step-back` / `quote-step-next` / `quote-step-skip` | `QuoteStep` footer | Navigation controls (`skip` only on optional steps) |
+| `quote-choice-<value>` | `ChoiceOption` atom | One per choice — project type, timeframe or service slug |
+| `quote-field-<name>` | `TextField` / `FileDropZone` / `SuburbCombobox` | `suburb`, `message`, `attachments`, `fullName`, `email`, `phone` |
+| `quote-field-suburb-options` | `SuburbCombobox` | Suggestion listbox (only present while open) |
+| `quote-field-<name>-error` | inline error under a text field | `suburb`, `message`, `fullName`, `email`, `phone` |
+| `quote-error-<name>` | inline error under a choice group | `projectType`, `services`, `timeframe`, `attachments` |
+| `quote-review` | `QuoteReview` molecule | Summary screen |
+| `quote-review-edit-<key>` | `QuoteReview` row | Jump back to that answer's step |
+| `quote-submit` | `QuoteReview` footer | Send enquiry |
+| `quote-result` | `QuoteResult` molecule | Outcome screen (`data-status` mirrors `sent` / `not-configured` / `error`) |
+| `quote-result-mailto` | `QuoteResult` | Prefilled `mailto:` fallback while the send endpoint is unbuilt |
 | `privacy-page` | `/privacy` | Privacy route root |
 | `thank-you-page` | `/thank-you` | Thank-you route root |
 
@@ -124,7 +160,7 @@ Additions to this map require an entry here in the same PR.
 |---|---|---|
 | Fase 0 · Alignment | ✅ 2026-08-28 | 12 blocking questions resolved. |
 | Fase 1 · Foundation | ✅ 2026-08-28 | Scaffolding, tokens, Header/Footer, Hero, docs. |
-| Fase 2 · Sections | ⏳ Next | Services, Process, Gallery, About, Contact banner. |
+| Fase 2 · Sections | ✅ 2026-08-31 | Services · Process · Gallery · About · Contact banner all shipped. Ready for fine-tuning. |
 | Fase 3 · Integrations | ⏳ | Contact form, uploads, Blob/Upstash/Resend, tracking events. |
 | Fase 4 · QA & docs | ⏳ | Full breakpoint pass, reduced motion, keyboard, docs sync. |
 
@@ -135,3 +171,37 @@ Additions to this map require an entry here in the same PR.
 - **2026-08-28 · Services grid = 5 cards** (Renovations & New Builds as a single card).
 - **2026-08-28 · No credentials provisioned yet.** All integrations degrade visibly; provisioning is a follow-up task after design ships.
 - **2026-08-30 · Hero redesigned to editorial layered composition.** Two-column split with `ShapeFrame` (arch-top-right main image + overlapping polaroid inset), curved `WaveDivider` between all home sections, alternating `paper` / `paper-soft` / `green` surfaces. New atoms: `ShapeFrame`, `WaveDivider`. Hero headline is now a segmented array (`{ text, em? }[]`) with Cormorant Garamond italic emphasis on "plastering" and "painting".
+- **2026-08-30 · Added `BrushTracing` molecule.** Continuous animated line backdrop (two layers — soft ribbons + thin lines) with independent yoyo dashoffset tweens per path. Reusable via `intensity` (subtle/medium/strong) and `pathSet` (hero/section) props. Currently mounted in the Hero at `intensity="subtle"`, replaces the static corner ornament SVGs. Honours `prefers-reduced-motion`.
+- **2026-08-30 · BrushTracing animation reworked to continuous unidirectional flow.** Paths enter one edge and exit the opposite edge (no yoyo). Reset happens while off-canvas so the loop is imperceptible. Alternate directions per index. Linear ease. Line-layer opacity dropped for `subtle` (0.38 → 0.18) and traversal duration slowed (~6–9 s → 18–28.5 s per traversal).
+- **2026-08-30 · WaveDivider gained `transparentFrom` mode.** Skips its own `from` background so the parent provides the colour. Used inside the Hero as a bottom-pinned overlay so `BrushTracing` visually gets clipped by the curve instead of the section's rectangular bottom edge. The `paper → paper-soft` divider now lives inside the Hero rather than as a standalone divider in `page.tsx`.
+- **2026-08-31 · Hero rewritten to a diamond-reveal composition.** Right column is an SVG with 3 rotated rounded-square clip windows revealing a shared `/images/house-4.jpg`; the three `<image>` elements are pixel-identical (same href / x / y / size / preserveAspectRatio) so the shot reads as one continuous photo seen through three windows. Timeline choreographs: copy sliding in from the left, main diamond rising from below, two smaller diamonds descending from above, `BrushTracing` fading in last. First-visit delay is 1.05 s to sit under the preloader curtain; repeat-visit delay is 0.15 s (checks `sessionStorage.ob_seen`). Copy trimmed to eyebrow + short H1 + one-line lead + single primary CTA + bottom label. Removed `ShapeFrame` / polaroid inset / secondary CTA / BrushSeal / three-item strip from the Hero.
+- **2026-08-31 · Preloader rewritten around the real transparent logo + a real progress bar.** The SVG reconstruction of the badge was replaced with `<img src="/brand/logo-transparent.png">` centred over the green curtain. A slim gold progress bar sits below the logo and fills as `/brand/logo-transparent.png` plus the five `/images/house-*.jpg` files resolve in the browser cache (both `load` and `error` events count so a failed asset never blocks the reveal). The curtain lifts only when all critical assets have settled AND a `MIN_DURATION_MS = 1100` floor has elapsed, so instant cache hits still feel deliberate; a `MAX_DURATION_MS = 5000` fail-safe closes it if the network stalls. `sessionStorage.ob_seen` and `prefers-reduced-motion` still skip the curtain instantly.
+- **2026-09-03 · Post-Fase-2 polish bundle applied.** Nine focused fixes, no scope creep:
+  1. Preloader rewritten to use the real transparent logo (`/brand/logo-transparent.png`) + a slim gold progress bar that reflects the actual preload state of the critical hero assets (logo + 5 house images). Curtain lifts when all resolve AND `MIN_DURATION_MS=1100` has elapsed; `MAX_DURATION_MS=5000` fail-safe.
+  2. Preloader background changed to `--color-ob-paper`.
+  3. Preloader ↔ Hero synced via `CustomEvent 'ob:hero-reveal'` + `window.__obHeroRevealed` flag — hero entry animations start when the curtain begins lifting instead of after a guessed fixed delay.
+  4. `h1-h4` base rule wrapped in `@layer base` so Tailwind utilities (like `text-[var(--color-ob-paper)]` on green sections) win by natural cascade order.
+  5. `Footer` lost its `mt-24` — used to leave a paper gap between the green Contact banner and the green Footer. Footer's own `pt-20` covers breathing room.
+  6. Cross-fade image cycling in the Hero — two overlaid `<g>` layers, `href` swapped on the hidden layer before both crossfade simultaneously, so there's never a blank frame between images.
+  7. Favicon wired to `/brand/favicon.png` via `icons: { icon, apple, shortcut }` in `seo.ts`.
+  8. Mobile hamburger fixed — root cause was `backdrop-filter` on `<header>` establishing a containing block for its `fixed` descendants; the drawer inside was collapsing to the header's box. Fix: drawer moved out of header as a sibling. Also added a floating mobile hamburger button (`z-40 lg:hidden`) that appears when the header is hidden.
+  9. Hydration mismatch on mobile fixed — Chrome auto-translate mutating DOM. Added `translate="no"` on `<html>` + `metadata.other.google = 'notranslate'`.
+  Also: Nodo credit added to Footer + mobile drawer bottom, replaced text wordmark in Footer with `/brand/logo-white-transparent.png`, replaced text wordmark in Hero with `/brand/logo-transparent.png`.
+- **2026-08-31 · Gallery, About and Contact banner shipped (Fase 2 complete).** Three new organisms: `GalleryBento` (green surface, 4-image asymmetric bento — feature-left with the brand-authentic craftsman shot, plus a landscape + two squares in the right column), `AboutSection` (paper surface, split copy + brand-authentic image at top, four `coreValues` as a horizontal strip below a hairline), and `ContactBanner` (green surface, centred heading + primary CTA + inline email/phone links). `content.ts`: `CoreValue` gained a `slug` field, added `gallerySection` copy, `contact.cta` for the banner button. `page.tsx` cleaned up — removed the `SectionPlaceholder` helper and its `Container` / `SectionHeading` / `cn` imports now that no stubs remain. Fase 2 fully implemented and ready for fine-tuning per the user's preference to iterate section-by-section after the full picture is in place.
+- **2026-08-31 · Process section shipped (Fase 2).** New organism `ProcessTimeline` on `paper` surface (between Services above and Gallery below). Single `<ol>` renders the 5 steps from `content.ts`; responsive layout switches from a mobile vertical stack (circle left, copy right, vertical rail behind circles) to a desktop horizontal timeline (`justify-between`, circles distributed, horizontal rail through their centres, copy centred beneath). Numbered circles use paper background + gold border + Cormorant number; the rail (~45% gold) sits behind so the paper-filled circles cover it cleanly in the gaps. Visual numbers are `aria-hidden` so the `<ol>` semantics aren't announced twice. Section header copy centralised in `content.ts` as `processSection`.
+- **2026-08-31 · Services section shipped (Fase 2).** New organism `ServicesGrid` on `paper-soft` surface with a responsive `md:grid-cols-2 lg:grid-cols-3` grid of five `ServiceCard`s. Each card: image (aspect 4/3) + eyebrow + name + summary + gold-dot bullets + text-link CTA `/contact?service={slug}` (query wired in Fase 3). `SectionHeading` gained a `headingId` prop so parents can wire `aria-labelledby`. Section header copy centralised in `content.ts` as `servicesSection`.
+- **2026-08-31 · Header hidden while the hero is in view.** The `Header` organism now tracks `pastHero` (scrollY > `innerHeight * 0.9`) instead of a shallow scroll threshold. When at the hero it renders `-translate-y-full opacity-0 pointer-events-none` (removed from tab order too); it slides down with the paper background once the hero has scrolled past. The mobile hamburger inherits the same visibility rule. Brand presence during the hero is covered by a small OB wordmark absolutely positioned in the hero's top-left.
+
+- **2026-09-12 · Quote requests move into a conversational modal.** Every "Request a quote" CTA (Hero, Header desktop, mobile drawer, ContactBanner, and each ServiceCard's "Discuss this service") now raises a Typeform-style modal instead of navigating to `/contact`. One question per screen, seven numbered steps grouping the nine Fase-0 fields (contact details share the last screen), plus an intro, a review screen with per-row Edit, and a result screen.
+  - **Triggers keep their `href`.** `QuoteCta` / `QuoteCtaLink` render the same anchor to `/contact` (`?service=<slug>` from the service cards) and only `preventDefault()` an unmodified left click. No JavaScript, middle-click and "open in new tab" all still reach a real page, and the links stay crawlable. `?service=` is read from `window.location` at click time rather than via `searchParams`, which keeps `/contact` statically prerendered.
+  - **`/contact` is now a real contact page** — email, phone, hours, service area — and doubles as that fallback.
+  - **Accessibility deliberately diverges from the Header drawer.** The modal mounts only while open (no lingering tab stops), portals to `<body>`, traps Tab, restores focus to the trigger on close, and marks `#ob-app` `inert` — hence the new wrapper div in the root layout. Choice steps land focus on the screen container, not the first option, so Enter continues instead of picking A.
+  - **Keyboard model:** Enter continues (Cmd/Ctrl + Enter in the message box); A–E select, single choice auto-advancing after 280 ms; Esc closes and the draft resumes from `sessionStorage.ob_quote_draft`.
+  - **No backend yet — visible degradation.** `submitQuote()` in `src/lib/quote.ts` is a documented stub returning `not-configured`; the result screen says plainly that nothing was sent and hands over a prefilled `mailto:` built from the answers, noting that photos must be attached by hand. Attachments are held in memory only (Vercel Blob is unprovisioned). When `POST /api/contact` lands, only the body of `submitQuote()` changes — `quoteSchema` is already shared.
+  - New animation category `quoteStepSwap` (§6). New form primitives `TextField` and `ChoiceOption` — the first in the system. `Header.tsx` stopped hardcoding "Request a quote" and reads `contact.cta.label`.
+
+- **2026-09-12 · Suburb step gained Auckland autocomplete.** `SuburbCombobox` molecule + `src/lib/suburbs.ts` (327 entries: the 187 metropolitan suburbs from Wikipedia's "List of suburbs of Auckland", which carry an `area` label shown as secondary text, merged with the Auckland Region locality categories — Rodney, Franklin, Hibiscus Coast, Matakana Coast, Pōhutukawa Coast, Waiheke and the Gulf islands).
+  - **Free text is never blocked.** It is a combobox, not a select. The list is a convenience, not a gazetteer, and is not exhaustive — an unlisted locality must never stop an enquiry. Swap in a LINZ NZ Place Names Gazetteer extract if exhaustiveness is ever needed.
+  - `normaliseSuburb` strips macrons and folds `Saint` ↔ `St`, so "otahuhu" offers "Ōtāhuhu" and "st hel" offers "Saint Heliers". Ranking is whole-name prefix → word prefix → substring, capped at 8.
+  - Keyboard: ↑/↓ move through suggestions, Enter picks the highlighted one (and stops propagating so the flow does not also advance), Enter with nothing highlighted falls through to the flow and continues, Escape closes the list only. `QuoteModal`'s Escape handler now skips `event.defaultPrevented` so closing the list never closes the modal.
+

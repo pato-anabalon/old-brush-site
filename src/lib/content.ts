@@ -9,6 +9,11 @@
  * infer literal types (used by services, routing helpers, tracking).
  */
 
+import type {
+  ProjectType as QuoteProjectType,
+  Timeframe as QuoteTimeframe,
+} from '@/lib/quote'
+
 export const brand = {
   name: 'Old Brush',
   legalName: 'Old Brush',
@@ -309,4 +314,185 @@ export const contact = {
   headline: 'Tell us about your space.',
   lead: 'Share the details and we will come back within one working day.',
   cta: { label: 'Request a quote', href: '/contact' },
+} as const
+
+/**
+ * Quote flow · conversational modal copy
+ *
+ * One question per screen, Typeform-style. Every visible string in the
+ * flow lives here — components must not inline copy.
+ *
+ * `import type` only, so there is no runtime cycle with `@/lib/quote`
+ * (which imports `services` and `brand` from this file).
+ */
+export const quoteFlow = {
+  /** Shared shell + accessibility strings. */
+  shell: {
+    title: 'Request a quote',
+    close: 'Close',
+    progress: 'Question {current} of {total}',
+    /** Announced politely on every step change. */
+    announce: 'Question {current} of {total}. {question}',
+  },
+
+  intro: {
+    headline: 'Let us get your project sorted.',
+    lead: 'A few quick questions about your space. It takes about two minutes, and there is no obligation.',
+    start: 'Start',
+    hint: 'press Enter',
+  },
+
+  buttons: {
+    back: 'Back',
+    next: 'Continue',
+    skip: 'Skip this',
+    submit: 'Send enquiry',
+    submitting: 'Sending',
+    edit: 'Edit',
+    backToReview: 'Back to review',
+    close: 'Close',
+  },
+
+  hints: {
+    enter: 'press Enter',
+    textarea: 'Shift + Enter for a new line',
+    multi: 'Choose as many as you like, then press Enter',
+  },
+
+  steps: {
+    projectType: {
+      question: 'First up — what kind of project is this?',
+      helper: 'Pick whichever is closest. We can sort out the detail later.',
+    },
+    services: {
+      question: 'Which parts of the work are you after?',
+      helper: 'Choose as many as apply.',
+    },
+    suburb: {
+      question: 'Which Auckland suburb is the property in?',
+      helper:
+        'Start typing and pick from the list — or just type it in if yours is not there. We work right across the Auckland region.',
+      placeholder: 'Ponsonby',
+      label: 'Suburb',
+    },
+    timeframe: {
+      question: 'When are you hoping to start?',
+      helper: 'A rough idea is plenty — nothing is locked in.',
+    },
+    message: {
+      question: 'Anything else we should know?',
+      helper:
+        'Ceiling heights, existing finishes, access, colour ideas — whatever helps us quote accurately. Optional.',
+      placeholder: 'Tell us about the space...',
+      label: 'Your message',
+    },
+    attachments: {
+      question: 'Have you got photos of the space?',
+      helper:
+        'Photos help us quote far more accurately. Up to 5 files, 20 MB in total. Entirely optional.',
+      dropLabel: 'Drag your photos here, or',
+      browse: 'browse your files',
+      accepted: 'JPG, PNG, HEIC, WEBP or PDF',
+      remove: 'Remove {name}',
+      totalLabel: '{count} of 5 files · {size} of 20 MB',
+    },
+    contactDetails: {
+      question: 'Lastly — how do we reach you?',
+      helper: 'We come back to every enquiry within one working day.',
+      fullNameLabel: 'Full name',
+      fullNamePlaceholder: 'Jane Smith',
+      emailLabel: 'Email',
+      emailPlaceholder: 'jane@example.co.nz',
+      phoneLabel: 'Mobile',
+      phoneOptional: 'optional',
+      phonePlaceholder: '021 234 5678',
+    },
+  },
+
+  /** Choice labels, keyed by the unions in `@/lib/quote`. */
+  projectTypeLabels: {
+    renovation: 'A renovation',
+    'new-build': 'A new build',
+    repaint: 'A repaint',
+    other: 'Something else',
+  } satisfies Record<QuoteProjectType, string>,
+
+  timeframeLabels: {
+    asap: 'As soon as possible',
+    '1-3-months': 'In one to three months',
+    '3-plus-months': 'In three months or more',
+    flexible: 'Still flexible',
+  } satisfies Record<QuoteTimeframe, string>,
+
+  /** Short field names used on the review screen and in the email body. */
+  fieldLabels: {
+    projectType: 'Project type',
+    services: 'Services of interest',
+    suburb: 'Suburb',
+    timeframe: 'Timeframe',
+    message: 'Message',
+    fullName: 'Name',
+    email: 'Email',
+    phone: 'Mobile',
+    attachments: 'Photos',
+  },
+
+  errors: {
+    tooMany: 'That is more than five files — please remove a few.',
+    tooLarge: 'Those files add up to more than 20 MB — please remove a few.',
+    wrongType: 'We can only take JPG, PNG, HEIC, WEBP or PDF files.',
+  },
+
+  review: {
+    eyebrow: 'Almost there',
+    headline: 'Does this all look right?',
+    lead: 'Have a quick read, change anything you need to, then send it through.',
+    noneProvided: 'Not provided',
+    noFiles: 'No photos attached',
+    fileCount: '{count} attached',
+  },
+
+  result: {
+    /** Shown once the send endpoint exists. */
+    sent: {
+      eyebrow: 'Enquiry received',
+      headline: 'Thank you.',
+      body: 'We have got your details and will come back to you within one working day.',
+    },
+    /**
+     * Shown today. Automatic sending is not wired up yet, so we say so
+     * rather than pretending the enquiry went through.
+     */
+    notConfigured: {
+      eyebrow: 'One last step',
+      headline: 'Your enquiry is ready to send.',
+      body: 'Automatic sending is not connected on this site yet, so nothing has been sent. Open the email below — all of your answers are already in it — and send it, or ring us directly.',
+      mailtoLabel: 'Open in my email app',
+      attachmentsNote:
+        'Photos cannot travel with that link, so please attach them to the email before you send it.',
+      orCall: 'Prefer to talk it through?',
+    },
+    error: {
+      eyebrow: 'Something went wrong',
+      headline: 'That did not go through.',
+      body: 'Your answers are still here, so you can try again. If it keeps failing, reach us directly.',
+      retry: 'Try again',
+    },
+  },
+} as const
+
+/**
+ * `/contact` route copy. The route is both the no-JavaScript fallback for
+ * the quote flow and a destination in its own right, so it carries the
+ * direct contact details rather than only a button.
+ */
+export const contactPage = {
+  ctaLabel: 'Request a quote',
+  ctaHelper: 'Answer a few quick questions and we will come back within one working day.',
+  detailsEyebrow: 'Reach us directly',
+  hoursLabel: 'Hours',
+  areaLabel: 'Service area',
+  area: 'Auckland region',
+  emailLabel: 'Email',
+  phoneLabel: 'Phone',
 } as const

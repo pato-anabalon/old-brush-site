@@ -5,9 +5,9 @@ import gsap from "gsap";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useId, useRef } from "react";
-import { Button } from "@/components/atoms/Button";
 import { WaveDivider } from "@/components/atoms/WaveDivider";
 import { BrushTracing } from "@/components/molecules/BrushTracing";
+import { QuoteCta } from "@/components/molecules/QuoteCta";
 import { brand, hero } from "@/lib/content";
 
 // Coordination event dispatched by the Preloader — see Preloader.tsx.
@@ -240,10 +240,10 @@ export function HeroBrush() {
         <Image
           src="/brand/logo-transparent.png"
           alt={`${brand.name} · ${brand.tagline}`}
-          width={140}
-          height={140}
+          width={200}
+          height={200}
           priority
-          className="h-16 w-16 sm:h-40 sm:w-40 lg:h-[140px] lg:w-[140px]"
+          className="h-16 w-16 sm:h-40 sm:w-40 lg:h-[200px] lg:w-[200px]"
         />
       </div>
 
@@ -368,7 +368,7 @@ export function HeroBrush() {
           left edge rather than sitting inside the shared 3rem/48px
           container padding. Mobile keeps the standard responsive gutter. */}
       <div className="relative z-10 order-1 flex min-h-[calc(100svh-14rem)] items-center px-5 sm:px-8 lg:order-none lg:pl-25 lg:pr-0">
-        <div className="flex w-full flex-col gap-6 lg:max-w-[26vw]">
+        <div data-hero-copy className="flex w-full flex-col gap-6 lg:max-w-[26vw]">
           <p
             data-hero-anim
             className="ob-eyebrow"
@@ -411,15 +411,15 @@ export function HeroBrush() {
           </p>
 
           <div data-hero-anim className="pt-2">
-            <Button
-              href={hero.primaryCta.href}
+            <QuoteCta
+              source="hero"
               variant="primary"
               size="lg"
               data-testid="home-hero-primary-cta"
             >
               {hero.primaryCta.label}
               <ArrowRight aria-hidden="true" size={16} />
-            </Button>
+            </QuoteCta>
           </div>
 
           <p

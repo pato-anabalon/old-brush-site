@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
+import { QuoteCtaLink } from '@/components/molecules/QuoteCta'
 import type { Service } from '@/lib/content'
 import { servicesSection } from '@/lib/content'
 
@@ -71,8 +71,9 @@ export function ServiceCard({ service }: Props) {
           className="mt-auto flex items-center gap-2 border-t pt-5 text-[0.75rem] uppercase tracking-[0.2em]"
           style={{ borderColor: 'var(--color-ob-line)' }}
         >
-          <Link
-            href={`/contact?service=${service.slug}`}
+          <QuoteCtaLink
+            service={service.slug}
+            source="service-card"
             className="inline-flex items-center gap-2 text-[var(--color-ob-green)] transition-colors hover:text-[var(--color-ob-gold)]"
             data-testid={`home-services-card-${service.slug}-cta`}
           >
@@ -82,7 +83,7 @@ export function ServiceCard({ service }: Props) {
               size={14}
               className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-brush)] group-hover:translate-x-1"
             />
-          </Link>
+          </QuoteCtaLink>
         </div>
       </div>
     </article>

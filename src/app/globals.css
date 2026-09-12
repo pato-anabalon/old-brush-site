@@ -173,6 +173,134 @@ p {
 }
 
 /* -------------------------------------------------------------------------
+ * Utilities · Quote flow form controls
+ * The only form primitives in the system. Used by TextField,
+ * ChoiceOption and FileDropZone inside the quote modal.
+ * ------------------------------------------------------------------------- */
+.ob-field {
+  width: 100%;
+  background-color: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--color-ob-line);
+  border-radius: 0;
+  padding: 0.5rem 0 0.65rem;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--color-ob-ink);
+  transition: border-color var(--duration-base) var(--ease-plaster);
+}
+.ob-field::placeholder {
+  color: color-mix(in srgb, var(--color-ob-ink-soft) 45%, transparent);
+}
+.ob-field:hover {
+  border-bottom-color: var(--color-ob-sand);
+}
+.ob-field:focus {
+  outline: none;
+  border-bottom-color: var(--color-ob-gold);
+}
+.ob-field:focus-visible {
+  outline: none;
+}
+.ob-field[aria-invalid='true'] {
+  border-bottom-color: #9a3b25;
+}
+textarea.ob-field {
+  min-height: 7.5rem;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Selectable option with a letter badge (A / B / C ...) */
+.ob-choice {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.875rem;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border: 1px solid var(--color-ob-line);
+  border-radius: var(--radius-sm);
+  background-color: color-mix(in srgb, var(--color-ob-paper) 70%, transparent);
+  color: var(--color-ob-ink);
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  transition:
+    border-color var(--duration-fast) var(--ease-brush),
+    background-color var(--duration-fast) var(--ease-brush);
+}
+.ob-choice:hover {
+  border-color: var(--color-ob-gold);
+  background-color: color-mix(in srgb, var(--color-ob-gold) 8%, transparent);
+}
+.ob-choice[aria-checked='true'],
+.ob-choice[data-selected='true'] {
+  border-color: var(--color-ob-gold);
+  background-color: color-mix(in srgb, var(--color-ob-gold) 14%, transparent);
+}
+.ob-choice-key {
+  display: inline-flex;
+  height: 1.65rem;
+  width: 1.65rem;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-ob-line);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-ob-paper);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--color-ob-ink-soft);
+}
+.ob-choice[aria-checked='true'] .ob-choice-key,
+.ob-choice[data-selected='true'] .ob-choice-key {
+  border-color: var(--color-ob-gold);
+  background-color: var(--color-ob-gold);
+  color: var(--color-ob-paper);
+}
+
+/* Suburb autocomplete suggestions */
+.ob-suggestion {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ob-line) 55%, transparent);
+}
+.ob-suggestion:last-child {
+  border-bottom: 0;
+}
+.ob-suggestion[data-active='true'] {
+  background-color: color-mix(in srgb, var(--color-ob-gold) 14%, transparent);
+}
+
+/* Thin progress rail in the modal header */
+.ob-progress {
+  height: 2px;
+  width: 100%;
+  background-color: var(--color-ob-line);
+  overflow: hidden;
+}
+.ob-progress > span {
+  display: block;
+  height: 100%;
+  background-color: var(--color-ob-gold);
+  transform-origin: left center;
+  transition: width var(--duration-slow) var(--ease-plaster);
+}
+
+/* Inline error text */
+.ob-field-error {
+  font-size: 0.85rem;
+  color: #9a3b25;
+}
+
+/* -------------------------------------------------------------------------
  * Reduced motion
  * Any component reading prefers-reduced-motion also honours it in JS;
  * this global rule is the CSS-only fallback.

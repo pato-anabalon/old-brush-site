@@ -1,16 +1,17 @@
-import { ArrowRight, Mail, Phone } from 'lucide-react'
-import { Button } from '@/components/atoms/Button'
-import { Container } from '@/components/atoms/Container'
-import { SectionHeading } from '@/components/molecules/SectionHeading'
-import { ScrollReveal } from '@/components/molecules/ScrollReveal'
-import { brand, contact } from '@/lib/content'
+import { ArrowRight, Mail, Phone } from "lucide-react";
+import { Container } from "@/components/atoms/Container";
+import { QuoteCta } from "@/components/molecules/QuoteCta";
+import { SectionHeading } from "@/components/molecules/SectionHeading";
+import { ScrollReveal } from "@/components/molecules/ScrollReveal";
+import { brand, contact } from "@/lib/content";
 
 /**
  * ContactBanner · final home CTA banner.
  *
  * Green surface (matches the closing rhythm of the page). Centered
- * heading, primary CTA to `/contact`, and inline email + phone so users
- * who prefer to reach us directly can do so without leaving the page.
+ * heading, primary CTA that raises the quote flow, and inline email +
+ * phone so users who prefer to reach us directly can do so without
+ * leaving the page.
  */
 export function ContactBanner() {
   return (
@@ -34,25 +35,22 @@ export function ContactBanner() {
             />
           </div>
 
-          <div
-            data-reveal
-            className="mt-10 flex flex-col items-center gap-8"
-          >
-            <Button
-              href={contact.cta.href}
+          <div data-reveal className="mt-10 flex flex-col items-center gap-8">
+            <QuoteCta
+              source="contact-banner"
               variant="primary"
               size="lg"
               data-testid="home-contact-cta"
             >
               {contact.cta.label}
               <ArrowRight aria-hidden="true" size={16} />
-            </Button>
+            </QuoteCta>
 
             <div
               className="flex flex-col items-center gap-3 text-[0.95rem] sm:flex-row sm:gap-8"
               style={{
                 color:
-                  'color-mix(in oklab, var(--color-ob-paper) 85%, transparent)',
+                  "color-mix(in oklab, var(--color-ob-paper) 85%, transparent)",
               }}
             >
               <a
@@ -76,5 +74,5 @@ export function ContactBanner() {
         </ScrollReveal>
       </Container>
     </section>
-  )
+  );
 }

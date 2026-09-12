@@ -3,10 +3,10 @@
 import { Menu, X } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useId, useState } from 'react'
-import { Button } from '@/components/atoms/Button'
 import { Container } from '@/components/atoms/Container'
 import { Logo } from '@/components/atoms/Logo'
-import { credit, nav } from '@/lib/content'
+import { QuoteCta } from '@/components/molecules/QuoteCta'
+import { contact, credit, nav } from '@/lib/content'
 import { cn } from '@/lib/cn'
 
 // Header stays hidden while the hero is on screen and reveals once the
@@ -115,14 +115,14 @@ export function Header() {
           </nav>
 
           <div className="hidden lg:block">
-            <Button
-              href="/contact"
+            <QuoteCta
+              source="header"
               size="sm"
               variant="primary"
               data-testid="site-header-cta"
             >
-              Request a quote
-            </Button>
+              {contact.cta.label}
+            </QuoteCta>
           </div>
 
           <button
@@ -192,15 +192,16 @@ export function Header() {
             </Link>
           ))}
           <div className="pt-6">
-            <Button
-              href="/contact"
-              onClick={() => setOpen(false)}
+            <QuoteCta
+              source="header-drawer"
+              onActivate={() => setOpen(false)}
               size="lg"
               variant="primary"
               className="w-full"
+              data-testid="site-header-drawer-cta"
             >
-              Request a quote
-            </Button>
+              {contact.cta.label}
+            </QuoteCta>
           </div>
         </nav>
 
