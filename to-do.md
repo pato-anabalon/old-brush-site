@@ -107,6 +107,15 @@ Compilan `typecheck` / `lint` / `build`, pero el flujo interactivo todavía no s
 
 ---
 
+## 📱 UX/UI mobile
+
+- [x] **Bug de rotación en iOS** — cerrado 2026-09-12. Al volver de landscape a vertical la página quedaba al ~57% con Services y Gallery desbordando. Causa: `min-width: auto` en los items de grid + intrínseco cacheado por WebKit. Fix: `min-w-0 w-full` en los hijos directos de grid. Detalle en `OLD_BRUSH_PROJECT_CONTEXT.md §12`.
+- [x] **`viewport-fit=cover` + gutters con safe-area** — los `env(safe-area-inset-*)` valían 0 sin el meta. Nueva utility `.ob-gutter`.
+- [ ] Chrome en iOS deja margen lateral en landscape porque no honra `viewport-fit=cover`. Es limitación del navegador; en Safari va a pantalla completa. Reevaluar si Chrome iOS lo soporta más adelante.
+- [ ] Pase general de UX/UI mobile pendiente (el resto de las secciones a 375/390px)
+
+---
+
 ## 🔍 Fase 4 · QA & Documentation
 
 - [ ] Audit visual en **375 / 768 / 1024 / 1440 px** — verificar sin horizontal overflow, jerarquías coherentes

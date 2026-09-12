@@ -43,7 +43,13 @@ export function ServicesGrid() {
             data-testid="home-services-card-grid"
           >
             {services.map((service) => (
-              <div key={service.slug} data-reveal className="h-full">
+              // `min-w-0 w-full`: a grid item defaults to `min-width: auto`,
+              // which sizes it from its intrinsic width. iOS WebKit keeps
+              // that intrinsic size cached across an orientation change, so
+              // the cards stayed at their landscape width when rotating back
+              // to portrait, overflowed the viewport, and Safari zoomed the
+              // whole page out to compensate.
+              <div key={service.slug} data-reveal className="h-full min-w-0 w-full">
                 <ServiceCard service={service} />
               </div>
             ))}

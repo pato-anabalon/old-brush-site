@@ -163,6 +163,11 @@ export function HeroBrush() {
             duration: 0.9,
             ease: "power3.out",
             stagger: 0.12,
+            // See ScrollReveal — a lingering identity transform keeps the
+            // node on its own composited layer and iOS WebKit then skips
+            // re-laying it out on rotation. The diamonds are deliberately
+            // NOT cleared: their rotation:45 is permanent state.
+            clearProps: "transform,opacity",
           },
           0,
         );
@@ -367,8 +372,8 @@ export function HeroBrush() {
       {/* Text column — bypasses Container on lg+ so the copy hugs the
           left edge rather than sitting inside the shared 3rem/48px
           container padding. Mobile keeps the standard responsive gutter. */}
-      <div className="relative z-10 order-1 flex min-h-[calc(100svh-14rem)] items-center px-5 sm:px-8 lg:order-none lg:pl-25 lg:pr-0">
-        <div data-hero-copy className="flex w-full flex-col gap-6 lg:max-w-[26vw]">
+      <div className="relative z-10 order-1 flex min-h-[calc(100svh-14rem)] items-center pl-[max(1.25rem,env(safe-area-inset-left))] pr-[max(1.25rem,env(safe-area-inset-right))] sm:pl-[max(2rem,env(safe-area-inset-left))] sm:pr-[max(2rem,env(safe-area-inset-right))] lg:order-none lg:pl-25 lg:pr-0">
+        <div className="flex w-full flex-col gap-6 lg:max-w-[26vw]">
           <p
             data-hero-anim
             className="ob-eyebrow"

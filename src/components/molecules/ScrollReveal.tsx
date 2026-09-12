@@ -52,6 +52,13 @@ export function ScrollReveal({
               ease: 'power3.out',
               stagger,
               delay,
+              // Load-bearing: without this GSAP leaves an identity
+              // `transform` inline forever, which keeps the element
+              // promoted to its own composited layer. iOS WebKit then
+              // fails to re-lay-out those layers after an orientation
+              // change — grid items kept their landscape width, the page
+              // overflowed, and Safari zoomed out to compensate.
+              clearProps: 'transform,opacity',
             })
           },
         })

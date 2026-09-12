@@ -53,7 +53,7 @@ export function GalleryBento() {
                 (stretched to match the right column via lg:h-full), fixed
                 portrait aspect on mobile. */}
             <div
-              className="relative aspect-[3/4] overflow-hidden rounded-[var(--radius-xl)] lg:aspect-auto lg:h-full"
+              className="relative min-w-0 w-full aspect-[3/4] overflow-hidden rounded-[var(--radius-xl)] lg:aspect-auto lg:h-full"
               data-testid="home-gallery-item-craftsman"
             >
               <Image
@@ -68,7 +68,7 @@ export function GalleryBento() {
             {/* Right column: wide landscape on top, two squares below. */}
             <div className="flex flex-col gap-4 lg:gap-6">
               <div
-                className="relative aspect-[16/9] overflow-hidden rounded-[var(--radius-xl)]"
+                className="relative min-w-0 w-full aspect-[16/9] overflow-hidden rounded-[var(--radius-xl)]"
                 data-testid="home-gallery-item-approach"
               >
                 <Image
@@ -79,9 +79,9 @@ export function GalleryBento() {
                   className="object-cover"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-4 lg:gap-6">
+              <div className="grid min-w-0 w-full grid-cols-2 gap-4 lg:gap-6">
                 <div
-                  className="relative aspect-square overflow-hidden rounded-[var(--radius-xl)]"
+                  className="relative min-w-0 w-full aspect-square overflow-hidden rounded-[var(--radius-xl)]"
                   data-testid="home-gallery-item-detail"
                 >
                   <Image
@@ -93,7 +93,7 @@ export function GalleryBento() {
                   />
                 </div>
                 <div
-                  className="relative aspect-square overflow-hidden rounded-[var(--radius-xl)]"
+                  className="relative min-w-0 w-full aspect-square overflow-hidden rounded-[var(--radius-xl)]"
                   data-testid="home-gallery-item-facade"
                 >
                   <Image

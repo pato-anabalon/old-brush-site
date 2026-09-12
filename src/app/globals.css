@@ -156,6 +156,29 @@ p {
   color: var(--color-ob-paper);
 }
 
+/* Shared horizontal gutter (Container). Mirrors the old
+ * `px-5 sm:px-8 lg:px-12` scale, but never lets the content sit closer to
+ * the edge than the safe area — with `viewport-fit=cover` the page runs
+ * edge to edge, so in landscape the notch would otherwise clip the copy.
+ * env() resolves to 0 wherever there is no inset, so this is a no-op on
+ * every non-notched device. */
+.ob-gutter {
+  padding-left: max(1.25rem, env(safe-area-inset-left));
+  padding-right: max(1.25rem, env(safe-area-inset-right));
+}
+@media (width >= 40rem) {
+  .ob-gutter {
+    padding-left: max(2rem, env(safe-area-inset-left));
+    padding-right: max(2rem, env(safe-area-inset-right));
+  }
+}
+@media (width >= 64rem) {
+  .ob-gutter {
+    padding-left: max(3rem, env(safe-area-inset-left));
+    padding-right: max(3rem, env(safe-area-inset-right));
+  }
+}
+
 /* Editorial eyebrow label (used by SectionHeading) */
 .ob-eyebrow {
   font-family: var(--font-display);

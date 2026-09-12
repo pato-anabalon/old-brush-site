@@ -5,7 +5,6 @@ import { Footer } from '@/components/organisms/Footer'
 import { Header } from '@/components/organisms/Header'
 import { Preloader } from '@/components/molecules/Preloader'
 import { QuoteModalProvider } from '@/components/providers/QuoteModalProvider'
-import { ViewportProbe } from '@/components/molecules/ViewportProbe'
 import { cormorant, lora } from '@/lib/fonts'
 import { baseMetadata, localBusinessJsonLd } from '@/lib/seo'
 import './globals.css'
@@ -37,7 +36,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           mutating the tree deeper (a common source of hydration errors
           on mobile only). Users can still translate manually. */}
       <body suppressHydrationWarning>
-        <ViewportProbe />
         <QuoteModalProvider>
           {/* #ob-app is made `inert` while the quote modal is open, so the
               page behind it is unreachable by keyboard and screen reader. */}

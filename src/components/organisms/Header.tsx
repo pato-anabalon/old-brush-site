@@ -66,8 +66,8 @@ export function Header() {
         onClick={() => setOpen(true)}
         data-testid="site-floating-menu-toggle"
         className={cn(
-          'fixed right-4 top-4 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border backdrop-blur transition-opacity duration-[420ms] ease-[var(--ease-brush)] lg:hidden',
-          'border-[var(--color-ob-green)]/30 bg-[var(--color-ob-paper)]/75 text-[var(--color-ob-green)]',
+          'fixed right-4 top-4 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border transition-opacity duration-[420ms] ease-[var(--ease-brush)] lg:hidden',
+          'border-[var(--color-ob-green)]/30 bg-[var(--color-ob-paper)]/92 text-[var(--color-ob-green)]',
           visible
             ? 'pointer-events-none opacity-0'
             : 'pointer-events-auto opacity-100',
@@ -81,7 +81,7 @@ export function Header() {
       data-visible={visible ? 'true' : 'false'}
       className={cn(
         'fixed inset-x-0 top-0 z-50 transition-[transform,opacity] duration-[420ms] ease-[var(--ease-brush)]',
-        'bg-[var(--color-ob-paper)]/95 backdrop-blur border-b border-[var(--color-ob-line)] text-[var(--color-ob-green)]',
+        'bg-[var(--color-ob-paper)] border-b border-[var(--color-ob-line)] text-[var(--color-ob-green)]',
         visible
           ? 'translate-y-0 opacity-100 pointer-events-auto'
           : '-translate-y-full opacity-0 pointer-events-none',
@@ -141,13 +141,17 @@ export function Header() {
 
     </header>
 
-    {/* Mobile drawer — sibling of <header>, NOT a descendant. The
-        header applies `backdrop-blur`, which creates a containing
-        block for its fixed descendants; a drawer nested inside would
-        have its `fixed inset-0` collapse to the header's ~64 px box
-        instead of the viewport. As a sibling with no such ancestor,
-        `fixed inset-0` correctly fills the viewport. z-[60] keeps it
-        above the header (z-50) and the floating toggle (z-40). */}
+    {/* Mobile drawer — sibling of <header>, NOT a descendant. Any
+        filter/backdrop-filter/transform on <header> would create a
+        containing block for its fixed descendants, collapsing a nested
+        `fixed inset-0` to the header's ~64 px box. Kept as a sibling so
+        that stays true regardless of future header styling. z-[60] keeps
+        it above the header (z-50) and the floating toggle (z-40).
+
+        `invisible` when closed is load-bearing: as a permanently painted
+        viewport-sized fixed layer it both stayed in the tab order and
+        gave iOS WebKit a full-screen composited layer to keep stale
+        across an orientation change. */}
     <div
       id={drawerId}
       role="dialog"
@@ -155,9 +159,11 @@ export function Header() {
       aria-label="Site navigation"
       data-testid="site-header-drawer"
       className={cn(
-        'fixed inset-0 z-[60] lg:hidden bg-[var(--color-ob-green)] text-[var(--color-ob-paper)] transition-[opacity,transform] duration-[var(--duration-base)] ease-[var(--ease-brush)]',
+        'fixed inset-0 z-[60] lg:hidden bg-[var(--color-ob-green)] text-[var(--color-ob-paper)] transition-[opacity,transform,visibility] duration-[var(--duration-base)] ease-[var(--ease-brush)]',
         'flex flex-col',
-        open ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none',
+        open
+          ? 'visible opacity-100 translate-y-0 pointer-events-auto'
+          : 'invisible opacity-0 -translate-y-2 pointer-events-none',
       )}
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
