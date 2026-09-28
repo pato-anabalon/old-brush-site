@@ -141,7 +141,7 @@ export function QuoteModal({ open, seedService, onClose }: Props) {
         }}
       >
         <div className="flex flex-none items-center gap-4 px-6 pt-5 pb-3 md:px-12">
-          <p className="ob-eyebrow flex-1">{counter || quoteFlow.shell.title}</p>
+          <p className="ob-eyebrow ob-eyebrow-card flex-1">{counter || quoteFlow.shell.title}</p>
           <button
             type="button"
             onClick={onClose}

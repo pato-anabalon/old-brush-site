@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { brand, services, type ServiceSlug } from '@/lib/content'
+import { brand, quoteFlow } from '@/lib/content'
 
 /**
  * Old Brush · Quote request model
@@ -17,12 +17,51 @@ export const PROJECT_TYPES = [
   'renovation',
   'new-build',
   'repaint',
+  'patches',
   'other',
 ] as const
 export type ProjectType = (typeof PROJECT_TYPES)[number]
 
 export const TIMEFRAMES = ['asap', '1-3-months', '3-plus-months', 'flexible'] as const
 export type Timeframe = (typeof TIMEFRAMES)[number]
+
+/**
+ * Options for the "which parts of the work" step — a decision-tree
+ * category set specific to the quote flow, independent from the
+ * homepage `services` cards (which drive ServicesGrid, not this step).
+ */
+export const QUOTE_SERVICE_OPTIONS = [
+  'patches',
+  'interior-plastering',
+  'interior-painting',
+  'exterior-painting',
+  'wallpaper-removal',
+] as const
+export type QuoteServiceOption = (typeof QUOTE_SERVICE_OPTIONS)[number]
+
+/**
+ * Which of `QUOTE_SERVICE_OPTIONS` are offered per project type.
+ * `wallpaper-removal` only makes sense as a renovation task. A `patches`
+ * or `other` project type skips the services step entirely (see
+ * `stepsForProjectType` in QuoteFlow) — those empty arrays are
+ * unreachable but keep this a total mapping.
+ */
+export const SERVICE_OPTIONS_BY_PROJECT_TYPE: Record<
+  ProjectType,
+  readonly QuoteServiceOption[]
+> = {
+  renovation: [
+    'patches',
+    'interior-plastering',
+    'interior-painting',
+    'exterior-painting',
+    'wallpaper-removal',
+  ],
+  'new-build': ['interior-plastering', 'interior-painting', 'exterior-painting'],
+  repaint: ['interior-painting', 'exterior-painting'],
+  patches: [],
+  other: [],
+}
 
 /** Attachment limits — approved in Fase 0. */
 export const MAX_FILES = 5
@@ -38,11 +77,9 @@ export const ACCEPTED_MIME = [
  *  Safari/iOS needs spelled out for HEIC to be selectable. */
 export const ACCEPT_ATTRIBUTE = [...ACCEPTED_MIME, '.heic', '.heif'].join(',')
 
-const serviceSlugs = services.map((s) => s.slug) as [ServiceSlug, ...ServiceSlug[]]
-
 export type QuoteAnswers = {
   projectType: ProjectType | null
-  services: ServiceSlug[]
+  services: QuoteServiceOption[]
   suburb: string
   timeframe: Timeframe | null
   message: string
@@ -75,7 +112,7 @@ export const stepSchemas = {
   }),
   services: z.object({
     services: z
-      .array(z.enum(serviceSlugs))
+      .array(z.enum(QUOTE_SERVICE_OPTIONS))
       .min(1, 'Choose at least one — you can pick more than one.'),
   }),
   suburb: z.object({
@@ -172,8 +209,8 @@ export async function submitQuote(
 /* mailto fallback                                                             */
 /* -------------------------------------------------------------------------- */
 
-function labelForService(slug: ServiceSlug): string {
-  return services.find((s) => s.slug === slug)?.name ?? slug
+function labelForService(slug: QuoteServiceOption): string {
+  return quoteFlow.serviceOptionLabels[slug] ?? slug
 }
 
 /**

@@ -11,6 +11,7 @@
 
 import type {
   ProjectType as QuoteProjectType,
+  QuoteServiceOption,
   Timeframe as QuoteTimeframe,
 } from '@/lib/quote'
 
@@ -57,14 +58,14 @@ export type Service = {
 export const services: readonly Service[] = [
   {
     slug: 'surface-preparation',
-    name: 'Surface Preparation',
-    eyebrow: 'The foundation',
+    name: 'Patching & Repairs',
+    eyebrow: 'Interior repairs',
     summary:
-      'Every refined finish begins with meticulous preparation. We clean, sand, patch and prime so the coats that follow last for years, not months.',
+      'Careful repairs designed to make damage disappear. From small holes and dents to cracks and damaged plasterboard, we restore the surface and prepare it for a seamless final finish.',
     bullets: [
-      'Full assessment of walls, ceilings and trim',
-      'Patching, filling and dust-controlled sanding',
-      'Priming matched to substrate and topcoat',
+      'Holes, dents and damaged GIB repairs',
+      'Crack repairs and localised plastering',
+      'Sanded and prepared for a smooth, paint-ready finish',
     ],
     imageSrc: '/images/3.png',
     imageAlt: 'Old Brush brushes resting beside a paint tin on a linen cloth',
@@ -117,14 +118,14 @@ export const services: readonly Service[] = [
   },
   {
     slug: 'renovations-new-builds',
-    name: 'Renovations & New Builds',
-    eyebrow: 'From bare frame to final coat',
+    name: 'Wallpaper Removal',
+    eyebrow: 'A clean foundation',
     summary:
-      'We work alongside builders, designers and homeowners on renovations and new builds across Auckland — end-to-end plastering and painting.',
+      'Careful removal of existing wallpaper and preparation of the surface beneath, creating a clean foundation for a smooth, modern painted finish.',
     bullets: [
-      'Coordinated with your programme and trades',
-      'Attention to character detail in older homes',
-      'Consistent finish across every room',
+      'Wallpaper stripping and adhesive removal',
+      'Repairs to damaged or uneven surfaces',
+      'Skim coating and preparation ready for painting',
     ],
     imageSrc: '/images/4.png',
     imageAlt: 'A weatherboard villa with a green roof and picket fence in Auckland',
@@ -220,7 +221,12 @@ export const nav = {
     { label: 'Contact', href: '/contact' },
     { label: 'Privacy', href: '/privacy' },
   ],
-} as const satisfies { primary: readonly NavItem[]; footer: readonly NavItem[] }
+  backToTop: { label: 'Back to top' },
+} as const satisfies {
+  primary: readonly NavItem[]
+  footer: readonly NavItem[]
+  backToTop: { label: string }
+}
 
 /**
  * Hero copy is separated so the brand voice lives in one place
@@ -372,7 +378,7 @@ export const quoteFlow = {
       question: 'Which Auckland suburb is the property in?',
       helper:
         'Start typing and pick from the list — or just type it in if yours is not there. We work right across the Auckland region.',
-      placeholder: 'Ponsonby',
+      placeholder: 'e.g. Ponsonby',
       label: 'Suburb',
     },
     timeframe: {
@@ -384,6 +390,8 @@ export const quoteFlow = {
       helper:
         'Ceiling heights, existing finishes, access, colour ideas — whatever helps us quote accurately. Optional.',
       placeholder: 'Tell us about the space...',
+      /** Shown instead of `placeholder` when projectType is "other" — there is no space/finish context yet, so we ask about the project itself. */
+      placeholderOther: 'Tell us what you have in mind...',
       label: 'Your message',
     },
     attachments: {
@@ -400,12 +408,12 @@ export const quoteFlow = {
       question: 'Lastly — how do we reach you?',
       helper: 'We come back to every enquiry within one working day.',
       fullNameLabel: 'Full name',
-      fullNamePlaceholder: 'Jane Smith',
+      fullNamePlaceholder: 'e.g. Jane Smith',
       emailLabel: 'Email',
-      emailPlaceholder: 'jane@example.co.nz',
+      emailPlaceholder: 'e.g. jane@example.co.nz',
       phoneLabel: 'Mobile',
       phoneOptional: 'optional',
-      phonePlaceholder: '021 234 5678',
+      phonePlaceholder: 'e.g. 021 234 5678',
     },
   },
 
@@ -414,8 +422,22 @@ export const quoteFlow = {
     renovation: 'A renovation',
     'new-build': 'A new build',
     repaint: 'A repaint',
+    patches: 'Patches',
     other: 'Something else',
   } satisfies Record<QuoteProjectType, string>,
+
+  /**
+   * Labels for the "which parts of the work" step — a decision-tree
+   * category set specific to the quote flow, independent from the
+   * `services` cards above (which drive the homepage ServicesGrid).
+   */
+  serviceOptionLabels: {
+    patches: 'Patches',
+    'interior-plastering': 'Interior Plastering',
+    'interior-painting': 'Interior Painting',
+    'exterior-painting': 'Exterior Painting',
+    'wallpaper-removal': 'Wallpaper Removal',
+  } satisfies Record<QuoteServiceOption, string>,
 
   timeframeLabels: {
     asap: 'As soon as possible',

@@ -2,9 +2,9 @@
 
 import { ArrowLeft, Send } from 'lucide-react'
 import { Button } from '@/components/atoms/Button'
-import { quoteFlow, services } from '@/lib/content'
+import { quoteFlow } from '@/lib/content'
 import type { QuoteAnswers } from '@/lib/quote'
-import type { StepId } from '@/components/organisms/QuoteFlow'
+import { stepsForProjectType, type StepId } from '@/components/organisms/QuoteFlow'
 
 type Props = {
   headingId: string
@@ -32,6 +32,7 @@ export function QuoteReview({
   onSubmit,
 }: Props) {
   const none = quoteFlow.review.noneProvided
+  const visibleSteps = stepsForProjectType(answers.projectType)
 
   const rows: Row[] = [
     {
@@ -45,9 +46,7 @@ export function QuoteReview({
       key: 'services',
       label: quoteFlow.fieldLabels.services,
       value:
-        answers.services
-          .map((slug) => services.find((s) => s.slug === slug)?.name ?? slug)
-          .join(', ') || none,
+        answers.services.map((slug) => quoteFlow.serviceOptionLabels[slug]).join(', ') || none,
     },
     { id: 'suburb', key: 'suburb', label: quoteFlow.fieldLabels.suburb, value: answers.suburb || none },
     {
@@ -74,7 +73,7 @@ export function QuoteReview({
   return (
     <div data-quote-screen className="flex min-h-0 flex-1 flex-col" data-testid="quote-review">
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-8 md:px-12 md:py-10">
-        <p className="ob-eyebrow">{quoteFlow.review.eyebrow}</p>
+        <p className="ob-eyebrow ob-eyebrow-card">{quoteFlow.review.eyebrow}</p>
         <h2
           id={headingId}
           className="mt-3 text-[var(--text-h3)] leading-[1.25] text-[var(--color-ob-green)]"
@@ -86,13 +85,13 @@ export function QuoteReview({
         </p>
 
         <dl className="mt-7 flex flex-col">
-          {rows.map((row) => (
+          {rows.filter((row) => visibleSteps.includes(row.id)).map((row) => (
             <div
               key={row.key}
               className="flex items-start gap-4 border-t py-3.5 first:border-t-0 first:pt-0"
               style={{ borderColor: 'var(--color-ob-line)' }}
             >
-              <dt className="ob-eyebrow w-32 flex-none pt-1">{row.label}</dt>
+              <dt className="ob-eyebrow ob-eyebrow-card w-32 flex-none pt-1">{row.label}</dt>
               <dd className="flex-1 whitespace-pre-line text-[0.95rem]">{row.value}</dd>
               <button
                 type="button"

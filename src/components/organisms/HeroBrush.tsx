@@ -253,11 +253,12 @@ export function HeroBrush() {
       </div>
 
       {/* Diamond composition.
-          - Mobile: flex item `order-2` (below copy), square aspect, full width.
-          - Desktop: absolute inset-y-0 right-0 w-[62%] — full-height, dominant
-            two-thirds of the viewport. */}
+          - Mobile/tablet (< lg): hidden — the composition did not read well
+            at those widths.
+          - Desktop (lg+): absolute inset-y-0 right-0 w-[70%] — full-height,
+            dominant two-thirds of the viewport. */}
       <div
-        className="ob-diamonds-wrap relative order-2 mt-10 aspect-square w-full lg:absolute lg:inset-y-0 lg:right-0 lg:order-none lg:mt-0 lg:aspect-auto lg:w-[70%]"
+        className="ob-diamonds-wrap hidden lg:absolute lg:inset-y-0 lg:right-0 lg:block lg:w-[70%]"
         data-testid="home-hero-diamonds-wrap"
       >
         <svg

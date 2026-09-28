@@ -25,7 +25,8 @@
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
 
   /* Type scale (fluid) */
-  --text-eyebrow: 0.75rem;
+  --text-eyebrow: 1.125rem;
+  --text-eyebrow-card: 0.75rem;
   --text-base: 1rem;
   --text-lead: 1.125rem;
   --text-h3: clamp(1.35rem, 1.05rem + 1.2vw, 1.75rem);
@@ -186,6 +187,11 @@ p {
   letter-spacing: 0.28em;
   text-transform: uppercase;
   color: var(--color-ob-gold);
+}
+
+/* Eyebrow variant for ServicesGrid cards — keeps the original (pre-18px) size */
+.ob-eyebrow-card {
+  font-size: var(--text-eyebrow-card);
 }
 
 /* Hairline divider */

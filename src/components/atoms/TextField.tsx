@@ -63,7 +63,7 @@ export function TextField(props: TextFieldProps) {
 
   return (
     <div className={cn('flex flex-col gap-1.5', className)}>
-      <label htmlFor={id} className={cn('ob-eyebrow', hideLabel && 'sr-only')}>
+      <label htmlFor={id} className={cn('ob-eyebrow ob-eyebrow-card', hideLabel && 'sr-only')}>
         {label}
         {note ? (
           <span className="ml-2 normal-case tracking-normal text-[var(--color-ob-ink-soft)]">

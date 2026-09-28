@@ -18,17 +18,36 @@ import { QuoteResult } from '@/components/molecules/QuoteResult'
 import { QuoteReview } from '@/components/molecules/QuoteReview'
 import { QuoteStep } from '@/components/molecules/QuoteStep'
 import { SuburbCombobox } from '@/components/molecules/SuburbCombobox'
-import { quoteFlow, services, type ServiceSlug } from '@/lib/content'
+import { quoteFlow, type ServiceSlug } from '@/lib/content'
 import {
   PROJECT_TYPES,
+  SERVICE_OPTIONS_BY_PROJECT_TYPE,
   TIMEFRAMES,
   emptyAnswers,
   stepSchemas,
   submitQuote,
   validateAttachments,
+  type ProjectType,
   type QuoteAnswers,
+  type QuoteServiceOption,
   type QuoteSubmitResult,
 } from '@/lib/quote'
+
+/**
+ * Pre-tick mapping from a homepage service card to a quote-flow service
+ * option — used when a "Request a quote" CTA on a specific card opens
+ * the flow. `wallpaper-removal` only appears on the services step for a
+ * `renovation` project type, so the seed is harmless but invisible until
+ * the visitor picks that branch — the projectType-change filter in the
+ * reducer drops it again if they pick anything else.
+ */
+const SEED_TO_QUOTE_SERVICE: Partial<Record<ServiceSlug, QuoteServiceOption>> = {
+  'surface-preparation': 'patches',
+  'plaster-level-4': 'interior-plastering',
+  'plaster-level-5': 'interior-plastering',
+  'interior-painting': 'interior-painting',
+  'renovations-new-builds': 'wallpaper-removal',
+}
 
 gsap.registerPlugin(useGSAP)
 
@@ -53,6 +72,20 @@ export const STEP_ORDER: readonly StepId[] = [
 
 const FIRST_STEP = STEP_ORDER[0]!
 const LAST_STEP = STEP_ORDER[STEP_ORDER.length - 1]!
+
+/**
+ * The decision tree: which steps a given project type actually visits.
+ * - `patches` skips the services step — there is nothing to choose, the
+ *   project type already says what it is.
+ * - `other` skips services, suburb and timeframe (unknown scope) and
+ *   attachments, going straight from the message step to contact details.
+ * - Everything else (including no answer yet) walks the full order.
+ */
+export function stepsForProjectType(projectType: ProjectType | null): readonly StepId[] {
+  if (projectType === 'other') return ['projectType', 'message', 'contactDetails']
+  if (projectType === 'patches') return STEP_ORDER.filter((id) => id !== 'services')
+  return STEP_ORDER
+}
 
 /** Steps the visitor may leave untouched. */
 const OPTIONAL_STEPS: ReadonlySet<StepId> = new Set(['message', 'attachments'])
@@ -83,7 +116,7 @@ type Action =
   | { type: 'hydrate'; answers: Partial<QuoteAnswers> }
   | { type: 'seed'; service: ServiceSlug }
   | { type: 'set'; field: keyof QuoteAnswers; value: QuoteAnswers[keyof QuoteAnswers] }
-  | { type: 'toggle-service'; slug: ServiceSlug }
+  | { type: 'toggle-service'; slug: QuoteServiceOption }
   | { type: 'set-files'; files: File[] }
   | { type: 'errors'; errors: Partial<Record<string, string>> }
   | { type: 'go'; screen: Screen; direction: 1 | -1; returnToReview?: boolean }
@@ -106,16 +139,33 @@ function reducer(state: State, action: Action): State {
   switch (action.type) {
     case 'hydrate':
       return { ...state, answers: { ...state.answers, ...action.answers } }
-    case 'seed':
-      return state.answers.services.includes(action.service)
+    case 'seed': {
+      const mapped = SEED_TO_QUOTE_SERVICE[action.service]
+      return !mapped || state.answers.services.includes(mapped)
         ? state
-        : { ...state, answers: { ...state.answers, services: [...state.answers.services, action.service] } }
-    case 'set':
+        : { ...state, answers: { ...state.answers, services: [...state.answers.services, mapped] } }
+    }
+    case 'set': {
+      if (action.field === 'projectType') {
+        const nextType = action.value as ProjectType | null
+        const allowed = nextType ? SERVICE_OPTIONS_BY_PROJECT_TYPE[nextType] : []
+        return {
+          ...state,
+          answers: {
+            ...state.answers,
+            projectType: nextType,
+            // A previous branch's picks do not carry over to a new one.
+            services: state.answers.services.filter((s) => allowed.includes(s)),
+          },
+          errors: { ...state.errors, projectType: undefined },
+        }
+      }
       return {
         ...state,
         answers: { ...state.answers, [action.field]: action.value },
         errors: { ...state.errors, [action.field]: undefined },
       }
+    }
     case 'toggle-service': {
       const has = state.answers.services.includes(action.slug)
       return {
@@ -206,11 +256,12 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
       onProgress(null)
       return
     }
+    const order = stepsForProjectType(state.answers.projectType)
     onProgress({
-      current: STEP_ORDER.indexOf(state.screen.id) + 1,
-      total: STEP_ORDER.length,
+      current: order.indexOf(state.screen.id) + 1,
+      total: order.length,
     })
-  }, [state.screen, onProgress])
+  }, [state.screen, state.answers.projectType, onProgress])
 
   /* -- step swap (quoteStepSwap) ----------------------------------------- */
 
@@ -305,11 +356,12 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
         return
       }
       if (state.screen.kind === 'step') {
-        const next = STEP_ORDER[STEP_ORDER.indexOf(state.screen.id) + 1]
+        const order = stepsForProjectType(state.answers.projectType)
+        const next = order[order.indexOf(state.screen.id) + 1]
         goTo(next ? { kind: 'step', id: next } : { kind: 'review' }, 1)
       }
     },
-    [goTo, state.returnToReview, state.screen, validateStep],
+    [goTo, state.returnToReview, state.screen, state.answers.projectType, validateStep],
   )
 
   const goBack = useCallback(() => {
@@ -323,10 +375,11 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
       return
     }
     if (state.screen.kind !== 'step') return
-    const index = STEP_ORDER.indexOf(state.screen.id)
-    const previous = STEP_ORDER[index - 1]
+    const order = stepsForProjectType(state.answers.projectType)
+    const index = order.indexOf(state.screen.id)
+    const previous = order[index - 1]
     goTo(index === 0 || !previous ? { kind: 'intro' } : { kind: 'step', id: previous }, -1)
-  }, [goTo, state.returnToReview, state.screen])
+  }, [goTo, state.returnToReview, state.screen, state.answers.projectType])
 
   const submit = useCallback(async () => {
     dispatch({ type: 'submit-start' })
@@ -424,13 +477,16 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
         event.preventDefault()
         selectTimeframe(value)
       } else if (state.screen.id === 'services') {
-        const service = services[index]
-        if (!service) return
+        const options = state.answers.projectType
+          ? SERVICE_OPTIONS_BY_PROJECT_TYPE[state.answers.projectType]
+          : []
+        const slug = options[index]
+        if (!slug) return
         event.preventDefault()
-        dispatch({ type: 'toggle-service', slug: service.slug })
+        dispatch({ type: 'toggle-service', slug })
       }
     },
-    [advance, selectProjectType, selectTimeframe, state.screen],
+    [advance, selectProjectType, selectTimeframe, state.screen, state.answers.projectType],
   )
 
   /* -- render ------------------------------------------------------------- */
@@ -549,18 +605,21 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
           </div>
         )
 
-      case 'services':
+      case 'services': {
+        const options = state.answers.projectType
+          ? SERVICE_OPTIONS_BY_PROJECT_TYPE[state.answers.projectType]
+          : []
         return (
           <div role="group" aria-labelledby={headingId} className="flex flex-col gap-2.5">
-            {services.map((service, index) => (
+            {options.map((slug, index) => (
               <ChoiceOption
-                key={service.slug}
+                key={slug}
                 role="checkbox"
                 index={index}
-                label={service.name}
-                selected={state.answers.services.includes(service.slug)}
-                onSelect={() => dispatch({ type: 'toggle-service', slug: service.slug })}
-                data-testid={`quote-choice-${service.slug}`}
+                label={quoteFlow.serviceOptionLabels[slug]}
+                selected={state.answers.services.includes(slug)}
+                onSelect={() => dispatch({ type: 'toggle-service', slug })}
+                data-testid={`quote-choice-${slug}`}
               />
             ))}
             {state.errors.services ? (
@@ -570,6 +629,7 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
             ) : null}
           </div>
         )
+      }
 
       case 'suburb':
         return (
@@ -610,7 +670,11 @@ export function QuoteFlow({ seedService, onClose, onProgress, headingId }: Props
             multiline
             label={quoteFlow.steps.message.label}
             hideLabel
-            placeholder={quoteFlow.steps.message.placeholder}
+            placeholder={
+              state.answers.projectType === 'other'
+                ? quoteFlow.steps.message.placeholderOther
+                : quoteFlow.steps.message.placeholder
+            }
             value={state.answers.message}
             error={state.errors.message}
             data-field="message"

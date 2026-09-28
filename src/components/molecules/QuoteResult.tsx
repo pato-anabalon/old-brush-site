@@ -50,7 +50,7 @@ export function QuoteResult({
       data-status={result.status}
     >
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-8 md:px-12 md:py-10">
-        <p className="ob-eyebrow">{copy.eyebrow}</p>
+        <p className="ob-eyebrow ob-eyebrow-card">{copy.eyebrow}</p>
         <h2
           id={headingId}
           className="mt-3 text-[var(--text-h2)] leading-[1.15] text-[var(--color-ob-green)]"
@@ -81,7 +81,7 @@ export function QuoteResult({
               </p>
             ) : null}
 
-            <p className="mt-8 ob-eyebrow">{quoteFlow.result.notConfigured.orCall}</p>
+            <p className="mt-8 ob-eyebrow ob-eyebrow-card">{quoteFlow.result.notConfigured.orCall}</p>
             <ul className="mt-3 flex flex-col gap-2 text-[var(--color-ob-green)]">
               <li className="flex items-center gap-3">
                 <Phone aria-hidden="true" size={16} />

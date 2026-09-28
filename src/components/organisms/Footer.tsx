@@ -92,7 +92,7 @@ export function Footer() {
             {credit.by}{' '}
             <span className="font-medium">{credit.label}</span>
           </a>
-          <p className="ob-eyebrow" style={{ color: 'var(--color-ob-sand)' }}>
+          <p className="ob-eyebrow ob-eyebrow-card" style={{ color: 'var(--color-ob-sand)' }}>
             {brand.tagline} · {brand.location.short}
           </p>
         </div>

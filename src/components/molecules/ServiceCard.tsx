@@ -39,7 +39,7 @@ export function ServiceCard({ service }: Props) {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-6 lg:p-7">
-        <span className="ob-eyebrow" style={{ color: 'var(--color-ob-gold)' }}>
+        <span className="ob-eyebrow ob-eyebrow-card" style={{ color: 'var(--color-ob-gold)' }}>
           {service.eyebrow}
         </span>
 

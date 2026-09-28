@@ -48,13 +48,13 @@ export default function ContactPage() {
           className="mt-14 border-t pt-10"
           style={{ borderColor: 'var(--color-ob-line)' }}
         >
-          <p className="ob-eyebrow">{contactPage.detailsEyebrow}</p>
+          <p className="ob-eyebrow ob-eyebrow-card">{contactPage.detailsEyebrow}</p>
 
           <dl className="mt-6 grid gap-6 sm:grid-cols-2">
             <div className="flex items-start gap-3">
               <Mail aria-hidden="true" size={18} className="mt-1 text-[var(--color-ob-sand)]" />
               <div>
-                <dt className="ob-eyebrow">{contactPage.emailLabel}</dt>
+                <dt className="ob-eyebrow ob-eyebrow-card">{contactPage.emailLabel}</dt>
                 <dd className="mt-1">
                   <Link
                     href={`mailto:${brand.contact.email}`}
@@ -70,7 +70,7 @@ export default function ContactPage() {
             <div className="flex items-start gap-3">
               <Phone aria-hidden="true" size={18} className="mt-1 text-[var(--color-ob-sand)]" />
               <div>
-                <dt className="ob-eyebrow">{contactPage.phoneLabel}</dt>
+                <dt className="ob-eyebrow ob-eyebrow-card">{contactPage.phoneLabel}</dt>
                 <dd className="mt-1">
                   <Link
                     href={brand.contact.phoneHref}
@@ -86,7 +86,7 @@ export default function ContactPage() {
             <div className="flex items-start gap-3">
               <Clock aria-hidden="true" size={18} className="mt-1 text-[var(--color-ob-sand)]" />
               <div>
-                <dt className="ob-eyebrow">{contactPage.hoursLabel}</dt>
+                <dt className="ob-eyebrow ob-eyebrow-card">{contactPage.hoursLabel}</dt>
                 <dd className="mt-1 text-[var(--color-ob-ink-soft)]">{brand.contact.hours}</dd>
               </div>
             </div>
@@ -94,7 +94,7 @@ export default function ContactPage() {
             <div className="flex items-start gap-3">
               <MapPin aria-hidden="true" size={18} className="mt-1 text-[var(--color-ob-sand)]" />
               <div>
-                <dt className="ob-eyebrow">{contactPage.areaLabel}</dt>
+                <dt className="ob-eyebrow ob-eyebrow-card">{contactPage.areaLabel}</dt>
                 <dd className="mt-1 text-[var(--color-ob-ink-soft)]">{contactPage.area}</dd>
               </div>
             </div>

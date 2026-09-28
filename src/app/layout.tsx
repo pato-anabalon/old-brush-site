@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { BackToTop } from '@/components/molecules/BackToTop'
 import { Footer } from '@/components/organisms/Footer'
 import { Header } from '@/components/organisms/Header'
 import { Preloader } from '@/components/molecules/Preloader'
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Header />
             <main id="main">{children}</main>
             <Footer />
+            <BackToTop />
           </div>
         </QuoteModalProvider>
 
