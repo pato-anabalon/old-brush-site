@@ -53,8 +53,8 @@ export function AboutSection() {
               data-testid="home-about-image"
             >
               <Image
-                src="/images/3.png"
-                alt="Old Brush brushes resting beside a paint tin on a linen cloth"
+                src="/images/photo-9.jpg"
+                alt="An Old Brush crew member, Auckland"
                 fill
                 sizes="(min-width: 1024px) 35vw, 100vw"
                 className="object-cover"

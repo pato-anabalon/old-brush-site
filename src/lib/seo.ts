@@ -2,10 +2,34 @@ import type { Metadata } from 'next'
 import { brand, services } from '@/lib/content'
 
 /**
- * Absolute URL base used for canonicals, OG images and sitemap.
- * Keep in sync with `brand.url` in content.ts.
+ * Absolute URL base used for canonicals and OG images (sitemap.ts and
+ * robots.ts deliberately always use `brand.url` directly instead of this —
+ * see below).
+ *
+ * Resolves to whatever host is actually serving the request, not a
+ * hardcoded domain — otherwise `metadataBase` makes Next.js generate
+ * absolute URLs (`og:image`, `og:url`, canonicals) pointing at
+ * `brand.url` even from a Vercel preview deployment. `oldbrush.co.nz`
+ * hasn't been cut over to Vercel yet (DNS still resolves to the old
+ * Squarespace site), so a chat app fetching the preview link's og:image
+ * from that domain gets Squarespace's HTML back instead of a PNG and
+ * silently drops the image — title/description still show because
+ * those come from the page actually being shared, not the image fetch.
+ *
+ * Priority: explicit `SITE_URL` override > the stable production domain
+ * Vercel has assigned this project (`VERCEL_PROJECT_PRODUCTION_URL` —
+ * becomes `oldbrush.co.nz` automatically once DNS cuts over, no code
+ * change needed then) > this specific deployment's own URL
+ * (`VERCEL_URL`, e.g. a PR preview) > `brand.url` for local dev / any
+ * non-Vercel build.
  */
-const SITE_URL = brand.url
+const SITE_URL =
+  process.env.SITE_URL ||
+  (process.env.VERCEL_ENV === 'production' && process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : brand.url)
 
 /**
  * Base metadata shared by every route. Route-level helpers spread
