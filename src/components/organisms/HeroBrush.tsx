@@ -22,7 +22,7 @@ const REVEAL_EVENT = "ob:hero-reveal";
 const HERO_IMAGES = [
   "/images/photo-5.jpg",
   "/images/photo-7.jpg",
-  "/images/photo-9.jpg",
+  "/images/photo-6.jpg",
   "/images/photo-10.jpg",
   "/images/photo-2.jpg",
 ] as const;
