@@ -16,13 +16,15 @@ import { brand, hero } from "@/lib/content";
 // long the preload takes.
 const REVEAL_EVENT = "ob:hero-reveal";
 
-// House imagery cycled through the diamond composition.
-const HOUSE_IMAGES = [
-  "/images/house-1.jpg",
-  "/images/house-2.jpg",
-  "/images/house-3.jpg",
-  "/images/house-4.jpg",
-  "/images/house-5.jpg",
+// Brand-authentic job-site imagery cycled through the diamond
+// composition — real Old Brush crew at work (and at rest) across
+// Auckland homes, not stock photography.
+const HERO_IMAGES = [
+  "/images/photo-5.jpg",
+  "/images/photo-4.jpg",
+  "/images/photo-9.jpg",
+  "/images/photo-10.jpg",
+  "/images/photo-2.jpg",
 ] as const;
 const CYCLE_MS = 5000;
 const CROSSFADE_S = 0.5;
@@ -33,7 +35,7 @@ const CROSSFADE_S = 0.5;
  * Composition (back-to-front):
  *  1. Continuous line-tracing backdrop (delayed fade-in).
  *  2. Oversized diamond composition on the right — three rounded-square
- *     clip windows (rotated 45°) revealing a shared house-4.jpg. On
+ *     clip windows (rotated 45°) revealing a shared job-site photo. On
  *     desktop the wrapper is absolutely pinned to `inset-y-0 right-0`
  *     with `w-[62%]`, so the diamonds span the full viewport height and
  *     dominate the right two-thirds of the screen. On mobile the wrapper
@@ -51,7 +53,7 @@ export function HeroBrush() {
   const clipS1Id = useId();
   const clipS2Id = useId();
 
-  // Rotate through the house imagery every CYCLE_MS with a real cross-
+  // Rotate through the hero imagery every CYCLE_MS with a real cross-
   // fade. Two overlaid <g> layers hold the same 3-clip composition; on
   // each tick we swap the `href` of the currently-hidden layer to the
   // next source, then fade that layer IN while the visible one fades
@@ -65,19 +67,19 @@ export function HeroBrush() {
     ).matches;
     if (reduced) return;
 
-    const preloaded = HOUSE_IMAGES.map((src) => {
+    const preloaded = HERO_IMAGES.map((src) => {
       const img = new window.Image();
       img.src = src;
       return img;
     });
 
-    // Start state: layer A visible with HOUSE_IMAGES[last]; layer B hidden.
-    let currentIndex = HOUSE_IMAGES.length - 1;
+    // Start state: layer A visible with HERO_IMAGES[last]; layer B hidden.
+    let currentIndex = HERO_IMAGES.length - 1;
     let visibleLayer: "a" | "b" = "a";
 
     const id = window.setInterval(() => {
-      currentIndex = (currentIndex + 1) % HOUSE_IMAGES.length;
-      const nextSrc = HOUSE_IMAGES[currentIndex];
+      currentIndex = (currentIndex + 1) % HERO_IMAGES.length;
+      const nextSrc = HERO_IMAGES[currentIndex];
       if (!nextSrc) return;
 
       const hiddenSelector =
@@ -266,7 +268,7 @@ export function HeroBrush() {
           preserveAspectRatio="xMidYMid slice"
           className="absolute inset-0 h-full w-full"
           role="img"
-          aria-label="Victorian residential home in Auckland — reference imagery"
+          aria-label="The Old Brush crew at work on homes across Auckland"
           data-testid="home-hero-diamonds"
         >
           <defs>
@@ -309,7 +311,7 @@ export function HeroBrush() {
               first paint matches the previously hard-coded shot. */}
           <g className="ob-layer-a" style={{ opacity: 1 }}>
             <image
-              href={HOUSE_IMAGES[HOUSE_IMAGES.length - 1]}
+              href={HERO_IMAGES[HERO_IMAGES.length - 1]}
               x="0"
               y="0"
               width="1200"
@@ -318,7 +320,7 @@ export function HeroBrush() {
               clipPath={`url(#${clipMainId})`}
             />
             <image
-              href={HOUSE_IMAGES[HOUSE_IMAGES.length - 1]}
+              href={HERO_IMAGES[HERO_IMAGES.length - 1]}
               x="0"
               y="0"
               width="1200"
@@ -327,7 +329,7 @@ export function HeroBrush() {
               clipPath={`url(#${clipS1Id})`}
             />
             <image
-              href={HOUSE_IMAGES[HOUSE_IMAGES.length - 1]}
+              href={HERO_IMAGES[HERO_IMAGES.length - 1]}
               x="0"
               y="0"
               width="1200"
@@ -340,7 +342,7 @@ export function HeroBrush() {
               the next source before fading it in. */}
           <g className="ob-layer-b" style={{ opacity: 0 }}>
             <image
-              href={HOUSE_IMAGES[0]}
+              href={HERO_IMAGES[0]}
               x="0"
               y="0"
               width="1200"
@@ -349,7 +351,7 @@ export function HeroBrush() {
               clipPath={`url(#${clipMainId})`}
             />
             <image
-              href={HOUSE_IMAGES[0]}
+              href={HERO_IMAGES[0]}
               x="0"
               y="0"
               width="1200"
@@ -358,7 +360,7 @@ export function HeroBrush() {
               clipPath={`url(#${clipS1Id})`}
             />
             <image
-              href={HOUSE_IMAGES[0]}
+              href={HERO_IMAGES[0]}
               x="0"
               y="0"
               width="1200"

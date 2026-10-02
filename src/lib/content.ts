@@ -281,7 +281,7 @@ export const servicesSection = {
 export const gallerySection = {
   eyebrow: 'The look',
   headline: "Interiors, at Old Brush's standard.",
-  lead: 'Reference imagery for the atmosphere and craft we chase across Auckland — real project photography lands here as consent and material are confirmed.',
+  lead: 'Real jobs, real crew — a look at the finishes and care we bring to homes across Auckland.',
   valuesEyebrow: 'Core values',
 } as const
 

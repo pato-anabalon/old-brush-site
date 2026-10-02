@@ -8,20 +8,76 @@ import { gallerySection } from '@/lib/content'
  * GalleryBento · home Gallery section.
  *
  * Green surface (dramatic dark break between the paper Process above
- * and the paper About below). Copy sits at the top, then an asymmetric
- * bento composition of four images:
+ * and the paper About below). Copy sits at the top, then a masonry
+ * composition of eight brand-authentic job-site photos — real Old Brush
+ * crew at work (painting, plastering, pressure washing, deck staining).
+ * CSS multi-column layout (not CSS grid) is used deliberately: the
+ * tallest-column stretch problem that forced `min-w-0 w-full` on every
+ * grid child elsewhere in this component never arises here, since
+ * multi-column items aren't grid items.
  *
- *   ┌──────────┬──────────────────────┐
- *   │          │        approach       │
- *   │  feature ├─────────┬─────────────┤
- *   │          │  detail │   facade    │
- *   └──────────┴─────────┴─────────────┘
+ * Collapses column count with viewport (1 → 2 → 3) rather than a fixed
+ * bento template, since every source photo is portrait-oriented.
  *
- * On mobile it collapses to a single-column stack. Image 2 (Old Brush
- * craftsman in branded shirt) is used as the feature — the only
- * brand-authentic shot in the composition, everything else is honestly
- * labelled reference imagery.
+ * Hover micro-interaction (hoverBrushGlow category): the image scales
+ * up inside its own clipped, fixed-size tile — the tile itself never
+ * grows, so neighbouring tiles never reflow. Same token-driven CSS
+ * hover-zoom as `ServiceCard` (`--duration-slow` / `--ease-brush` /
+ * `scale-[1.04]`); the global `prefers-reduced-motion` rule in
+ * `globals.css` collapses the transition, so no JS is needed and this
+ * stays a server component.
  */
+const galleryImages = [
+  {
+    slug: 'stopping-detail',
+    src: '/images/photo-8.jpg',
+    alt: 'An Old Brush plasterer smoothing a stopped wall joint with a trowel',
+    aspect: 'aspect-[4/5]',
+  },
+  {
+    slug: 'brush-detail',
+    src: '/images/photo-6.jpg',
+    alt: 'An Old Brush painter cutting in weatherboard cladding with a brush and kettle',
+    aspect: 'aspect-[3/4]',
+  },
+  {
+    slug: 'porch-exterior',
+    src: '/images/photo-7.jpg',
+    alt: 'An Old Brush painter rolling an entryway soffit on a residential home',
+    aspect: 'aspect-[3/4]',
+  },
+  {
+    slug: 'pressure-wash',
+    src: '/images/photo-1.jpg',
+    alt: 'An Old Brush team member pressure washing an exterior wall ahead of painting',
+    aspect: 'aspect-square',
+  },
+  {
+    slug: 'roller-sheeting',
+    src: '/images/photo-13.jpg',
+    alt: 'An Old Brush painter rolling a wall behind protective sheeting',
+    aspect: 'aspect-[4/5]',
+  },
+  {
+    slug: 'deck-stain',
+    src: '/images/photo-10.jpg',
+    alt: 'An Old Brush painter pouring deck stain into a tray on site',
+    aspect: 'aspect-square',
+  },
+  {
+    slug: 'wall-corner',
+    src: '/images/photo-11.jpg',
+    alt: 'An Old Brush plasterer stopping an internal wall corner',
+    aspect: 'aspect-[3/4]',
+  },
+  {
+    slug: 'kitchen-roller',
+    src: '/images/photo-3.jpg',
+    alt: 'An Old Brush painter rolling a kitchen splashback wall',
+    aspect: 'aspect-square',
+  },
+] as const
+
 export function GalleryBento() {
   return (
     <section
@@ -46,66 +102,24 @@ export function GalleryBento() {
 
           <div
             data-reveal
-            className="mt-14 grid gap-4 md:grid-cols-2 lg:mt-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-6"
+            className="mt-14 columns-1 gap-4 md:columns-2 lg:mt-20 lg:columns-3 lg:gap-6"
             data-testid="home-gallery-grid"
           >
-            {/* Feature — brand-authentic craftsman shot. Tall on desktop
-                (stretched to match the right column via lg:h-full), fixed
-                portrait aspect on mobile. */}
-            <div
-              className="relative min-w-0 w-full aspect-[3/4] overflow-hidden rounded-[var(--radius-xl)] lg:aspect-auto lg:h-full"
-              data-testid="home-gallery-item-craftsman"
-            >
-              <Image
-                src="/images/2.png"
-                alt="An Old Brush craftsman preparing an exterior window in a residential home"
-                fill
-                sizes="(min-width: 1024px) 40vw, (min-width: 768px) 50vw, 100vw"
-                className="object-cover"
-              />
-            </div>
-
-            {/* Right column: wide landscape on top, two squares below. */}
-            <div className="flex flex-col gap-4 lg:gap-6">
+            {galleryImages.map(({ slug, src, alt, aspect }) => (
               <div
-                className="relative min-w-0 w-full aspect-[16/9] overflow-hidden rounded-[var(--radius-xl)]"
-                data-testid="home-gallery-item-approach"
+                key={slug}
+                className={`group relative mb-4 w-full overflow-hidden rounded-[var(--radius-xl)] break-inside-avoid lg:mb-6 ${aspect}`}
+                data-testid={`home-gallery-item-${slug}`}
               >
                 <Image
-                  src="/images/house-1.jpg"
-                  alt="Residential home approach — reference imagery"
+                  src={src}
+                  alt={alt}
                   fill
-                  sizes="(min-width: 1024px) 55vw, (min-width: 768px) 50vw, 100vw"
-                  className="object-cover"
+                  sizes="(min-width: 1024px) 32vw, (min-width: 768px) 48vw, 100vw"
+                  className="object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-brush)] group-hover:scale-[1.04]"
                 />
               </div>
-              <div className="grid min-w-0 w-full grid-cols-2 gap-4 lg:gap-6">
-                <div
-                  className="relative min-w-0 w-full aspect-square overflow-hidden rounded-[var(--radius-xl)]"
-                  data-testid="home-gallery-item-detail"
-                >
-                  <Image
-                    src="/images/house-2.jpg"
-                    alt="Residential home detail — reference imagery"
-                    fill
-                    sizes="(min-width: 1024px) 27vw, (min-width: 768px) 25vw, 50vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div
-                  className="relative min-w-0 w-full aspect-square overflow-hidden rounded-[var(--radius-xl)]"
-                  data-testid="home-gallery-item-facade"
-                >
-                  <Image
-                    src="/images/house-3.jpg"
-                    alt="Residential home facade — reference imagery"
-                    fill
-                    sizes="(min-width: 1024px) 27vw, (min-width: 768px) 25vw, 50vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </ScrollReveal>
       </Container>
