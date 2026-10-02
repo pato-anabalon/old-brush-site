@@ -52,8 +52,7 @@ export default function OpenGraphImage() {
         {/* Gold seam between the two halves. */}
         <div style={{ width: 2, height: '100%', backgroundColor: '#9B762B' }} />
 
-        {/* Right — real crew photo, cropped to keep the top (face and
-            crossed arms) in frame. */}
+        {/* Right — real crew photo, vertically centred. */}
         <div
           style={{
             display: 'flex',
@@ -69,7 +68,7 @@ export default function OpenGraphImage() {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              objectPosition: 'top',
+              objectPosition: 'center',
             }}
           />
         </div>
