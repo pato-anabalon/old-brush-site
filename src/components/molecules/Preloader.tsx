@@ -30,7 +30,7 @@ const markRevealed = () => {
 const CRITICAL_ASSETS = [
   "/brand/logo-transparent.png",
   "/images/photo-5.jpg",
-  "/images/photo-4.jpg",
+  "/images/photo-7.jpg",
   "/images/photo-9.jpg",
   "/images/photo-10.jpg",
   "/images/photo-2.jpg",

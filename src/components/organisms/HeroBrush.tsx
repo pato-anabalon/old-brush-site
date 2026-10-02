@@ -21,7 +21,7 @@ const REVEAL_EVENT = "ob:hero-reveal";
 // Auckland homes, not stock photography.
 const HERO_IMAGES = [
   "/images/photo-5.jpg",
-  "/images/photo-4.jpg",
+  "/images/photo-7.jpg",
   "/images/photo-9.jpg",
   "/images/photo-10.jpg",
   "/images/photo-2.jpg",
