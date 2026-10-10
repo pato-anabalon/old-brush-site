@@ -1,3 +1,4 @@
+import { upload } from '@vercel/blob/client'
 import { z } from 'zod'
 import { brand, quoteFlow } from '@/lib/content'
 
@@ -189,20 +190,45 @@ export type QuoteSubmitResult = {
 }
 
 /**
- * TODO(fase-3-backend): replace the body with `fetch('/api/contact', …)`.
- * The route handler validates the same `quoteSchema` exported above, then
- * fans out to Resend (+ optional Trello / Telegram) and uploads the
- * attachments to Vercel Blob.
+ * Uploads attachments straight to Vercel Blob (Functions cap request
+ * bodies at 4.5 MB — well under the 20 MB this flow allows — so the
+ * browser uploads directly and `/api/contact` only receives the
+ * resulting URLs), then posts the answers to `POST /api/contact`, which
+ * validates the same `quoteSchema` exported above and fans out to Resend
+ * (+ optional Trello / Telegram).
  *
- * Until that endpoint exists this returns `not-configured` on purpose.
- * Per AGENTS.md a missing integration degrades *visibly* — we never
- * pretend an enquiry was delivered when nothing was sent.
+ * The route itself returns `not-configured` when Resend is not wired up
+ * server-side — per AGENTS.md a missing integration degrades *visibly*,
+ * we never pretend an enquiry was delivered when nothing was sent.
  */
 export async function submitQuote(
-  _answers: QuoteAnswers,
-  _files: readonly File[],
+  answers: QuoteAnswers,
+  files: readonly File[],
 ): Promise<QuoteSubmitResult> {
-  return { status: 'not-configured' }
+  try {
+    const attachments = await Promise.all(
+      files.map(async (file) => {
+        const blob = await upload(file.name, file, {
+          access: 'public',
+          handleUploadUrl: '/api/blob-upload',
+        })
+        return { url: blob.url, name: file.name, size: file.size }
+      }),
+    )
+
+    const res = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ answers, attachments }),
+    })
+    const data = (await res.json()) as QuoteSubmitResult
+    if (!res.ok && data.status !== 'error') {
+      return { status: 'error' }
+    }
+    return data
+  } catch {
+    return { status: 'error' }
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -213,41 +239,55 @@ function labelForService(slug: QuoteServiceOption): string {
   return quoteFlow.serviceOptionLabels[slug] ?? slug
 }
 
+export type QuoteLabels = {
+  projectType: Record<ProjectType, string>
+  timeframe: Record<Timeframe, string>
+  fields: Record<
+    'projectType' | 'services' | 'suburb' | 'timeframe' | 'message' | 'fullName' | 'email' | 'phone',
+    string
+  >
+  notProvided: string
+}
+
+/**
+ * The answer fields as ordered `{ label, value }` rows — shared by the
+ * `mailto:` fallback (client) and the internal notification email
+ * (server), so both present the same enquiry the same way.
+ */
+export function buildQuoteSummaryRows(
+  answers: QuoteAnswers,
+  labels: QuoteLabels,
+): { label: string; value: string }[] {
+  return [
+    { label: labels.fields.fullName, value: answers.fullName },
+    { label: labels.fields.email, value: answers.email },
+    { label: labels.fields.phone, value: answers.phone || labels.notProvided },
+    { label: labels.fields.suburb, value: answers.suburb },
+    {
+      label: labels.fields.projectType,
+      value: answers.projectType ? labels.projectType[answers.projectType] : labels.notProvided,
+    },
+    {
+      label: labels.fields.services,
+      value: answers.services.length
+        ? answers.services.map(labelForService).join(', ')
+        : labels.notProvided,
+    },
+    {
+      label: labels.fields.timeframe,
+      value: answers.timeframe ? labels.timeframe[answers.timeframe] : labels.notProvided,
+    },
+  ]
+}
+
 /**
  * Builds a `mailto:` link with every answer in the body, so the enquiry
  * still reaches Cristian while the send endpoint is unbuilt. Attachments
  * cannot ride along on a `mailto:` — the result screen says so plainly.
  */
-export function buildQuoteMailto(
-  answers: QuoteAnswers,
-  labels: {
-    projectType: Record<ProjectType, string>
-    timeframe: Record<Timeframe, string>
-    fields: Record<
-      'projectType' | 'services' | 'suburb' | 'timeframe' | 'message' | 'fullName' | 'email' | 'phone',
-      string
-    >
-    notProvided: string
-  },
-): string {
-  const rows: string[] = [
-    `${labels.fields.fullName}: ${answers.fullName}`,
-    `${labels.fields.email}: ${answers.email}`,
-    `${labels.fields.phone}: ${answers.phone || labels.notProvided}`,
-    `${labels.fields.suburb}: ${answers.suburb}`,
-    `${labels.fields.projectType}: ${
-      answers.projectType ? labels.projectType[answers.projectType] : labels.notProvided
-    }`,
-    `${labels.fields.services}: ${
-      answers.services.length ? answers.services.map(labelForService).join(', ') : labels.notProvided
-    }`,
-    `${labels.fields.timeframe}: ${
-      answers.timeframe ? labels.timeframe[answers.timeframe] : labels.notProvided
-    }`,
-    '',
-    `${labels.fields.message}:`,
-    answers.message || labels.notProvided,
-  ]
+export function buildQuoteMailto(answers: QuoteAnswers, labels: QuoteLabels): string {
+  const rows = buildQuoteSummaryRows(answers, labels).map((r) => `${r.label}: ${r.value}`)
+  rows.push('', `${labels.fields.message}:`, answers.message || labels.notProvided)
 
   const subject = `Quote enquiry — ${answers.fullName || 'Website'}`
   return `mailto:${brand.contact.email}?subject=${encodeURIComponent(

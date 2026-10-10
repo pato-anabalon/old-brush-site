@@ -504,6 +504,24 @@ export const quoteFlow = {
 } as const
 
 /**
+ * Copy for the two emails `POST /api/contact` sends via Resend: the
+ * internal notification to Cristian, and the short auto-reply confirming
+ * receipt to the visitor. Kept separate from `quoteFlow` since it is
+ * server-only and never rendered by a component.
+ */
+export const quoteEmail = {
+  internal: {
+    subject: (fullName: string) => `New quote enquiry — ${fullName}`,
+  },
+  autoReply: {
+    subject: 'We have received your enquiry — Old Brush',
+    greeting: (fullName: string) => `Kia ora ${fullName},`,
+    body: 'Thank you for reaching out to Old Brush. We have received your enquiry and will come back to you within one working day.',
+    signature: 'Old Brush — Traditional Finishes',
+  },
+} as const
+
+/**
  * `/contact` route copy. The route is both the no-JavaScript fallback for
  * the quote flow and a destination in its own right, so it carries the
  * direct contact details rather than only a button.

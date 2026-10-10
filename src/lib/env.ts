@@ -24,7 +24,9 @@ const envSchema = z.object({
 
   // Resend — email notifications
   RESEND_API_KEY: z.string().min(1).optional(),
-  RESEND_FROM: z.string().email().optional(),
+  // "Name <email@domain>" or a bare address — Resend accepts either, so this
+  // only checks it isn't empty rather than parsing strictly as an email.
+  RESEND_FROM: z.string().min(1).optional(),
   RESEND_TO_INTERNAL: z.string().email().optional(),
 
   // Trello — optional lead card
